@@ -1,4 +1,3 @@
-import { SecretManagerService } from '@/base/modules/secret/services';
 import {
   BadRequestException,
   CanActivate,
@@ -7,6 +6,7 @@ import {
   RawBodyRequest,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { sha256 } from 'js-sha256';
@@ -17,7 +17,7 @@ import { AlchemySignKey } from '../enums';
 export class AlchemyGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    private readonly secretManagerService: SecretManagerService,
+    private readonly configService: ConfigService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -40,8 +40,7 @@ export class AlchemyGuard implements CanActivate {
     }
 
     const signingKey =
-      process.env[signKeyName] ??
-      (await this.secretManagerService.getValueOrThrowAsync(signKeyName));
+      process.env[signKeyName] || this.configService.get<string>(signKeyName);
     const rawRequestBody = request?.rawBody;
 
     const hmac = sha256.hmac.create(signingKey);

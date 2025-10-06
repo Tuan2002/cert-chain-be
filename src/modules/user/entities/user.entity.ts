@@ -16,7 +16,7 @@ import {
 } from 'class-validator';
 import { Column, Entity, Index, OneToMany } from 'typeorm';
 import { UserRoles } from '../enums/roles.enum';
-import { Reward } from '../types/reward.type';
+
 @Index(['userName'], { unique: true })
 @Entity(Collections.User)
 export class User extends AbstractEntity {
@@ -28,12 +28,11 @@ export class User extends AbstractEntity {
   userName: string;
 
   @ApiProperty()
-  @ValidateIf((o) => o.email !== undefined)
   @IsNotEmpty()
   @Expose()
   @IsEmail()
   @Column({ unique: true, nullable: true })
-  email?: string;
+  email: string;
 
   @IsNotEmpty()
   @MinLength(8)
@@ -117,16 +116,6 @@ export class User extends AbstractEntity {
     nullable: true,
   })
   avatar?: string;
-
-  @ApiProperty({ nullable: true })
-  @ValidateIf((o) => o.referCode !== undefined)
-  @IsString()
-  @Column({ nullable: true })
-  referCode?: string;
-
-  @ApiProperty({ type: 'json', nullable: true })
-  @Column({ nullable: true })
-  rewards?: Reward[];
 
   // Relations
   @OneToMany(() => FileUpload, (fileUpload) => fileUpload.uploader)

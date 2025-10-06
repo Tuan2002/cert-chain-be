@@ -20,7 +20,6 @@ import { Observable } from 'rxjs';
 import slug from 'slug';
 import { fileFilter } from '../../utils';
 import { FILE_UPLOAD_METADATA_KEY } from '../decorators';
-import { SecretManagerService } from '../modules/secret/services';
 
 interface FileUploadOptions {
   folder?: StorageFolders;
@@ -35,7 +34,6 @@ export class FileUploadInterceptor implements NestInterceptor {
 
   constructor(
     private readonly configService: ConfigService,
-    private readonly secretManagerService: SecretManagerService,
   ) {}
 
   async intercept(
@@ -78,29 +76,11 @@ export class FileUploadInterceptor implements NestInterceptor {
     } = options;
 
     // Get credentials from environment variables (already loaded by SecretManager)
-    let accessKeyId = this.configService.get<string>('DO_SPACE_ACCESS_KEY');
-    let secretAccessKey = this.configService.get<string>('DO_SPACE_SECRET_KEY');
+    const accessKeyId = this.configService.get<string>('DO_SPACE_ACCESS_KEY');
+    const secretAccessKey = this.configService.get<string>('DO_SPACE_SECRET_KEY');
     const endpoint = this.configService.get<string>('DO_SPACE_ENDPOINT');
     const region = this.configService.get<string>('DO_SPACE_REGION');
     const bucketName = this.configService.get<string>('DO_SPACE_BUCKET_NAME');
-
-    // If credentials are still not available, try to get them from SecretManager
-    if (!accessKeyId || !secretAccessKey) {
-      const secrets = await this.secretManagerService
-        .getAllSecretsAsync()
-        .catch((error) => {
-          throw new InternalServerErrorException({
-            message: 'Failed to load secrets from SecretManager',
-            error: error.message,
-          });
-        });
-      accessKeyId = secrets.DO_SPACE_ACCESS_KEY || accessKeyId;
-      secretAccessKey = secrets.DO_SPACE_SECRET_KEY || secretAccessKey;
-      // Update environment variables for future use
-      if (accessKeyId) process.env.DO_SPACE_ACCESS_KEY = accessKeyId;
-      if (secretAccessKey) process.env.DO_SPACE_SECRET_KEY = secretAccessKey;
-    }
-
     if (!accessKeyId || !secretAccessKey) {
       throw new InternalServerErrorException({
         message:

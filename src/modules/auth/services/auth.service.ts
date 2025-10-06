@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import bcrypt from 'bcryptjs';
 import { plainToInstance } from 'class-transformer';
 import * as crypto from 'crypto';
+import dayjs from 'dayjs';
 import { Repository } from 'typeorm';
 import { CredentialLoginDto } from '../dto/credential-login.dto';
 import { ForgetPasswordDto } from '../dto/forget-password.dto';
@@ -15,7 +16,6 @@ import { InitialAdminDto } from '../dto/init-admin.dto';
 import { ResetPasswordDto } from '../dto/reset-password.dto';
 import { AuthorizedContext, ResponseToken } from '../types';
 import { AuthCacheService } from './auth-cache.service';
-import dayjs from 'dayjs';
 
 @Injectable()
 export class AuthService {
@@ -236,21 +236,5 @@ export class AuthService {
 
   async buildTokenForUser(userInfo: User) {
     return this.buildToken(userInfo);
-  }
-
-  private async buildOtpToken(userInfo: User) {
-    const otpToken = await this.jwtService.signAsync(
-      {
-        userId: userInfo.id,
-        email: userInfo.email,
-        userName: userInfo.userName,
-        avatar: userInfo?.avatar,
-      },
-      {
-        expiresIn: SecurityOptions.OTP_EXPIRATION_TIME,
-        secret: process.env.JWT_OTP_SECRET,
-      },
-    );
-    return otpToken;
   }
 }

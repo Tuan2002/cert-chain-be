@@ -10,7 +10,8 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { v4 as uuid } from 'uuid';
+import { v7 as uuid } from 'uuid';
+
 export abstract class AbstractEntity {
   @ObjectIdColumn({
     select: false,
