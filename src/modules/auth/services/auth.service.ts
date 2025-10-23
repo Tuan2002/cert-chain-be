@@ -1,4 +1,4 @@
-import { SecurityOptions } from '@constants';
+import { LOGIN_ERROR_CODES, SecurityOptions } from '@constants';
 import { User } from '@modules/user/entities';
 import { UserRoles } from '@modules/user/enums/roles.enum';
 import { UserService } from '@modules/user/services/user.service';
@@ -87,6 +87,7 @@ export class AuthService {
     if (!storedUser) {
       throw new BadRequestException({
         message: 'Login credentials is incorrect',
+        code: LOGIN_ERROR_CODES.ACCOUNT_NOT_CREATED,
       });
     }
 
@@ -104,6 +105,7 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new BadRequestException({
         message: 'Login credentials is incorrect',
+        code: LOGIN_ERROR_CODES.PASSWORD_INCORRECT,
       });
     }
 

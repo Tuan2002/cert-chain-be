@@ -51,6 +51,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
             MESSAGES.UNKNOWN_EXCEPTION_MESSAGE,
       timestamp: new Date().toISOString(),
       path: request.url,
+      code: typeof data === 'string' ? '' : (data as { code: string }).code,
       // data: typeof data === 'string' ? data : { ...data, statusCode: status },
     });
   }
