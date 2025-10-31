@@ -2,6 +2,7 @@
   "compilerOptions": {
     "esModuleInterop": true,
     "module": "commonjs",
+    "jsx": "react-jsx",
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,

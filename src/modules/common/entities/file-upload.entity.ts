@@ -1,6 +1,6 @@
+import { Tables } from '@/enums/tables.enum';
 import { AbstractEntity } from '@base/entities/base.entity';
 import { StorageFolders } from '@base/enums';
-import { Collections } from '@enums/collection.enum';
 import { User } from '@modules/user/entities';
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
@@ -8,7 +8,7 @@ import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { FileUploadStatus } from '../enums';
 
-@Entity(Collections.FileUpload)
+@Entity(Tables.FileUpload)
 export class FileUpload extends AbstractEntity {
   @ApiProperty()
   @Expose()
@@ -77,6 +77,6 @@ export class FileUpload extends AbstractEntity {
   @ManyToOne(() => User, (user) => user.fileUploads, {
     nullable: false,
   })
-  @JoinColumn({ name: 'uploaderId' })
+  @JoinColumn({ name: 'uploader_id' })
   uploader: User;
 }

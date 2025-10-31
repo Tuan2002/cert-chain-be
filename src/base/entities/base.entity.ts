@@ -1,47 +1,44 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Exclude, Expose } from 'class-transformer';
-import { IsMongoId } from 'class-validator';
+import { Expose } from 'class-transformer';
 import {
-  BeforeInsert,
   CreateDateColumn,
   DeleteDateColumn,
-  ObjectId,
-  ObjectIdColumn,
   PrimaryColumn,
-  UpdateDateColumn,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
 } from 'typeorm';
-import { v7 as uuid } from 'uuid';
 
 export abstract class AbstractEntity {
-  @ObjectIdColumn({
-    select: false,
-  })
-  @Exclude()
-  @IsMongoId()
-  _id: ObjectId;
-
   @PrimaryColumn()
-  @ApiProperty()
+  @PrimaryGeneratedColumn('uuid')
+  @ApiProperty({
+    description: 'The unique identifier of the entity',
+    example: '3ef45678-abcd-90ab-cdef-1234567890ab',
+  })
   @Expose()
   id: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'The date and time when the entity was created',
+    example: '2024-01-01T00:00:00.000Z',
+  })
   @CreateDateColumn({ type: 'timestamptz' })
   @Expose()
   createdAt: Date;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'The date and time when the entity was last updated',
+    example: '2024-01-02T00:00:00.000Z',
+  })
   @UpdateDateColumn({ type: 'timestamptz' })
   @Expose()
   updatedAt: Date;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'The date and time when the entity was deleted',
+    example: '2024-01-03T00:00:00.000Z',
+  })
   @DeleteDateColumn({ type: 'timestamptz' })
   @Expose()
   deletedAt: Date;
-
-  @BeforeInsert()
-  generateUniqueId() {
-    this.id = uuid();
-  }
 }

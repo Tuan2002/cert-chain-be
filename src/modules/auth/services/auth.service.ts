@@ -1,7 +1,6 @@
 import { LOGIN_ERROR_CODES, SecurityOptions } from '@constants';
 import { User } from '@modules/user/entities';
 import { UserRoles } from '@modules/user/enums/roles.enum';
-import { UserService } from '@modules/user/services/user.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,18 +14,14 @@ import { ForgetPasswordDto } from '../dto/forget-password.dto';
 import { InitialAdminDto } from '../dto/init-admin.dto';
 import { ResetPasswordDto } from '../dto/reset-password.dto';
 import { AuthorizedContext, ResponseToken } from '../types';
-import { AuthCacheService } from './auth-cache.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private jwtService: JwtService,
-    private authCacheService: AuthCacheService,
-    private userService: UserService,
-
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-  ) {}
+  ) { }
   /**
    * Initialize the administrator account with provided data.
    * @param initialData - The initial data for the administrator account.
@@ -37,7 +32,7 @@ export class AuthService {
   async initializeDataAsync(initialData: InitialAdminDto) {
     const { userName, email, password, firstName, lastName } = initialData;
 
-    const existAdminUser = await this.usersRepository.findOne({
+    const existAdminUser = await this.usersRepository.exists({
       where: { role: UserRoles.ADMIN },
     });
 
@@ -224,7 +219,6 @@ export class AuthService {
         userName: userInfo.userName,
         avatar: userInfo?.avatar,
         role: userInfo.role,
-        walletAddress: userInfo?.walletAddress,
       },
       {
         expiresIn: SecurityOptions.JWT_EXPIRATION_TIME,

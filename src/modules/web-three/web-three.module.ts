@@ -6,6 +6,8 @@ import { forwardRef, Module } from '@nestjs/common';
 import { DiscoveryModule } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ContractEventLoader } from './providers';
+import { OrganizationContractService } from './services';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
@@ -16,9 +18,11 @@ import { ContractEventLoader } from './providers';
   ],
   controllers: [],
   providers: [
-    ContractEventLoader,
+    OrganizationContractService,
+    ContractEventLoader
   ],
   exports: [
+    OrganizationContractService
   ],
 })
 export class WebThreeModule { }

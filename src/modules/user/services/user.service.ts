@@ -75,11 +75,12 @@ export class UserService {
    */
 
   async createUserAsync(createUserDto: CreateUserDto): Promise<BaseUserDto> {
-    const existUser = await this.usersRepository.exists({
+    const existUser = await this.usersRepository.find({
       where: {
         email: createUserDto.email,
       },
     });
+
     if (existUser) {
       throw new BadRequestException({
         message: 'This email is already in use',
@@ -100,6 +101,47 @@ export class UserService {
     return plainToInstance(BaseUserDto, createdUser, {
       excludeExtraneousValues: true,
     });
+  }
+
+  /**
+   * Create a new organization user.
+   * @param createUserDto - Data transfer object for creating a user.
+   * @returns The created user object.
+   * @throws BadRequestException if the email is already in use.
+   */
+  async createOrganizationUserAsync(createUserDto: CreateUserDto): Promise<{
+    id: string;
+    email: string;
+    password: string;
+  }> {
+    const existUser = await this.usersRepository.find({
+      where: {
+        email: createUserDto.email,
+      },
+    });
+
+    if (existUser) {
+      throw new BadRequestException({
+        message: 'This email is already in use',
+      });
+    }
+
+    const randomPassword = randomstring.generate();
+    const hashedPassword = await bcrypt.hash(
+      randomPassword,
+      SecurityOptions.PASSWORD_SALT_ROUNDS,
+    );
+    const newUser = this.usersRepository.create({
+      ...createUserDto,
+      userName: createUserDto.email,
+      hashedPassword,
+    });
+    const createdUser = await this.usersRepository.save(newUser);
+    return {
+      id: createdUser.id,
+      email: createdUser.email,
+      password: randomPassword,
+    };
   }
 
   /**

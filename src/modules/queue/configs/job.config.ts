@@ -8,7 +8,7 @@ import { JobsOptions } from 'bullmq';
  */
 export const DEFAULT_JOB_OPTIONS: JobsOptions = {
   // Attempts to retry the job if it fails
-  attempts: 4,
+  attempts: 5,
   backoff: {
     type: 'exponential',
     delay: 5000,
@@ -16,9 +16,9 @@ export const DEFAULT_JOB_OPTIONS: JobsOptions = {
   removeOnComplete: {
     // Keep completed jobs for 6 hours
     // This is useful for debugging and auditing purposes
-    // The webhook and lottery RPC events need for avoid duplicate processing
+    // The webhook and ETH RPC events need for avoid duplicate processing
     //! DO NOT SET TO true or 0, can be set to false or greater than 10 minutes
     age: 6 * 60 * 60,
   },
-  removeOnFail: 100,
+  removeOnFail: 50,
 };

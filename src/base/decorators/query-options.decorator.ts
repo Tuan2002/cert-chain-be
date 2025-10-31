@@ -1,19 +1,20 @@
-import { Filter, QueryOptionsDto } from '@base/dtos/query-options.dto';
 import { ExecutionContext, createParamDecorator } from '@nestjs/common';
 import { Request } from 'express';
+import { Filter, QueryOptionsDto } from '../dtos/query-options.dto';
 import { QueryOperator } from '../enums';
 interface Options {
-  acceptFilterFields: Array<
+  keepRawFilters?: boolean;
+  acceptFilterFields?: Array<
     | string
     | {
-        name: string;
-        type?:
-          | StringConstructor
-          | NumberConstructor
-          | BooleanConstructor
-          | DateConstructor
-          | ArrayConstructor;
-      }
+      name: string;
+      type?:
+      | StringConstructor
+      | NumberConstructor
+      | BooleanConstructor
+      | DateConstructor
+      | ArrayConstructor;
+    }
   >;
 }
 export class QueryOptionsHelper {
@@ -27,7 +28,10 @@ export class QueryOptionsHelper {
 
   constructor(
     partial: QueryOptionsDto,
-    options: Options = { acceptFilterFields: [] },
+    options: Options = {
+      keepRawFilters: false,
+      acceptFilterFields: []
+    },
   ) {
     this.sort = partial.sort || {};
     this.take = partial.limit || 10;
@@ -35,6 +39,7 @@ export class QueryOptionsHelper {
     this.search = partial.search || '';
     this.filters = this.mapFindOptions(
       partial.filters,
+      options.keepRawFilters,
       options.acceptFilterFields,
     );
     if (partial.page) this.page = partial.page;
@@ -52,21 +57,25 @@ export class QueryOptionsHelper {
 
   private mapFindOptions = (
     filters: QueryOptionsDto['filters'],
+    keepRawFilters = false,
     acceptFields: Array<
       | string
       | {
-          name: string;
-          type?:
-            | StringConstructor
-            | NumberConstructor
-            | BooleanConstructor
-            | DateConstructor
-            | ArrayConstructor;
-        }
+        name: string;
+        type?:
+        | StringConstructor
+        | NumberConstructor
+        | BooleanConstructor
+        | DateConstructor
+        | ArrayConstructor;
+      }
     > = [],
   ): Record<string, unknown> => {
-    const filterObject = {};
+    if (keepRawFilters) {
+      return filters
+    }
 
+    const filterObject = {};
     // Normalize acceptFields to object format
     const fieldConfigs = acceptFields.map((field) =>
       typeof field === 'string' ? { name: field, type: String } : field,
@@ -129,7 +138,7 @@ export class QueryOptionsHelper {
           filterObject[field] = { $lte: value };
           break;
         case QueryOperator.IN:
-          filterObject[field] = { $in: value };
+          filterObject[field] = { In: value };
           break;
         case QueryOperator.NOT_IN:
           filterObject[field] = { $nin: value };

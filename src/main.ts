@@ -7,6 +7,7 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { corsConfig } from './configs/cors.config';
+
 async function bootstrap() {
   const configService = new ConfigService();
   const logger = new Logger('NestApplication');

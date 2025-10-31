@@ -6,5 +6,5 @@ export const SecurityOptions = {
   FILE_SIGN_TIME: 60, // 1 minute
   LOCKOUT_DURATION: 5 * 60, // 5 minutes
   OTP_EXPIRATION_TIME: 5 * 60, // 5 minutes
-  DEFAULT_PASSWORD: 'LOTTERY@2025',
+  DEFAULT_PASSWORD: 'CERT_CHAIN@2025',
 };

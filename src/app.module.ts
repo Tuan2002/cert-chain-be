@@ -8,6 +8,8 @@ import { UserModule } from '@modules/user/user.module';
 import { WebThreeModule } from '@modules/web-three/web-three.module';
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
+import { MailModule } from './modules/mail/mail.module';
+import { OrganizationModule } from './modules/organization/organization.module';
 import { QueueModule } from './modules/queue/queue.module';
 import { WebhookModule } from './modules/webhook/webhook.module';
 
@@ -17,9 +19,11 @@ import { WebhookModule } from './modules/webhook/webhook.module';
     DatabaseModule,
     SharedModule,
     PassportModule,
+    CommonModule,
     AuthModule,
     UserModule,
-    CommonModule,
+    OrganizationModule,
+    MailModule,
     WebThreeModule,
     CronjobModule,
     QueueModule,

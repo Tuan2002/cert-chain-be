@@ -22,9 +22,6 @@ RUN pnpm run build
 # Stage 2: Production stage
 FROM node:20-alpine AS production
 
-# Enable corepack to use pnpm
-RUN corepack enable
-
 # Set working directory
 WORKDIR /usr/src/app
 
@@ -39,7 +36,6 @@ COPY --from=builder /usr/src/app/dist ./dist
 
 # Expose port
 EXPOSE 3000
-
 
 # Command to run the app
 CMD ["node", "dist/src/main"]

@@ -88,4 +88,4 @@ Examples:
 
 ## License
 
-Lottery is [MIT licensed](LICENSE).
+CERT CHAIN is [MIT licensed](LICENSE).

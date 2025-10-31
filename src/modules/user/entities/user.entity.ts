@@ -1,5 +1,6 @@
+import { Tables } from '@/enums/tables.enum';
+import { OrganizationMember } from '@/modules/organization/entities';
 import { AbstractEntity } from '@base/entities/base.entity';
-import { Collections } from '@enums/collection.enum';
 import { FileUpload } from '@modules/common/entities';
 import { Genders } from '@modules/user/enums';
 import { ApiProperty } from '@nestjs/swagger';
@@ -14,11 +15,10 @@ import {
   MinLength,
   ValidateIf,
 } from 'class-validator';
-import { Column, Entity, Index, OneToMany } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { UserRoles } from '../enums/roles.enum';
 
-@Index(['userName'], { unique: true })
-@Entity(Collections.User)
+@Entity(Tables.User)
 export class User extends AbstractEntity {
   @ApiProperty()
   @IsNotEmpty()
@@ -101,7 +101,11 @@ export class User extends AbstractEntity {
   @Column({ nullable: true })
   dob?: Date;
 
-  @ApiProperty({ nullable: true, enum: Genders, enumName: 'Gender' }) 2;
+  @ApiProperty({ 
+    nullable: true, 
+    enum: Genders, 
+    enumName: 'Gender'
+  })
   @IsOptional()
   @IsEnum(Genders)
   @Expose()
@@ -120,4 +124,7 @@ export class User extends AbstractEntity {
   // Relations
   @OneToMany(() => FileUpload, (fileUpload) => fileUpload.uploader)
   fileUploads: FileUpload[];
+
+  @OneToMany(() => OrganizationMember, (member) => member.user)
+  organizationMembers: OrganizationMember[];
 }

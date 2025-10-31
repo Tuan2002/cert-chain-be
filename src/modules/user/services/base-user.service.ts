@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { In, Repository } from 'typeorm';
 import { User } from '../entities';
 
 @Injectable()
@@ -8,8 +8,6 @@ export class BaseUserService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
-    @InjectDataSource()
-    private readonly dataSource: DataSource,
   ) {}
 
   /**
@@ -26,6 +24,7 @@ export class BaseUserService {
     if (!user) {
       throw new NotFoundException({
         message: `User with ID ${userId} not found`,
+        code: 'USER_NOT_FOUND',
       });
     }
     return user;
@@ -74,11 +73,9 @@ export class BaseUserService {
    * @throws BadRequestException if the user does not exist.
    */
   async findUsersByListIdsAsync(userIds: string[]): Promise<User[]> {
-    return this.dataSource.getMongoRepository(User).find({
+    return this.usersRepository.find({
       where: {
-        id: {
-          $in: [...userIds],
-        },
+        id: In(userIds),
       },
     });
   }

@@ -1,0 +1,3 @@
+export const CONTRACT_CHARACTERS = {
+  NAME_SLUG_SEPARATOR: ' ',
+}

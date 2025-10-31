@@ -11,7 +11,7 @@ import { BaseCacheService } from './services/redis-cache.service';
         type: 'single',
         url: configService.getOrThrow('REDIS_URL'),
         options: {
-          keyPrefix: 'LOTTERY:',
+          keyPrefix: 'CERT_CHAIN:',
         },
       }),
     }),

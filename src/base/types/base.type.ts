@@ -28,7 +28,9 @@ export class ResponseApp<T> {
 
   @ApiProperty()
   data: T;
-
-  // @ApiPropertyOptional({ type: ResponsePagination })
-  // pagination?: ResponsePagination;
 }
+
+export class ResponseAppPagination<T> extends ResponseApp<T> {
+  @ApiProperty({ type: ResponsePagination })
+  pagination: ResponsePagination;
+} 
