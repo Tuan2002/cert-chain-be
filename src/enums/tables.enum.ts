@@ -4,4 +4,5 @@ export enum Tables {
   Organization = 'organizations',
   OrganizationMember = 'organization_members',
   OrganizationRegistration = 'organization_registrations',
+  CertificateType = 'certificate_types'
 }

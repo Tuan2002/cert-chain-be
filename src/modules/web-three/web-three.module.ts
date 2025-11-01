@@ -6,7 +6,10 @@ import { forwardRef, Module } from '@nestjs/common';
 import { DiscoveryModule } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ContractEventLoader } from './providers';
-import { OrganizationContractService } from './services';
+import {
+  CertificateTypeContractService,
+  OrganizationContractService
+} from './services';
 
 @Module({
   imports: [
@@ -19,10 +22,12 @@ import { OrganizationContractService } from './services';
   controllers: [],
   providers: [
     OrganizationContractService,
+    CertificateTypeContractService,
     ContractEventLoader
   ],
   exports: [
-    OrganizationContractService
+    OrganizationContractService,
+    CertificateTypeContractService,
   ],
 })
 export class WebThreeModule { }

@@ -22,8 +22,7 @@ export class OrganizationContractService extends BaseContractService {
     ethersService: EthersService,
     configService: ConfigService,
     contractEventLoader: ContractEventLoader,
-    private readonly organizationEventQueueService: OrganizationEventQueueService,
-
+    private readonly organizationEventQueueService: OrganizationEventQueueService
   ) {
     super(
       ethersService,

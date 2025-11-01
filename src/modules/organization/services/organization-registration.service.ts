@@ -41,7 +41,8 @@ export class OrganizationRegistrationService {
    * Register a new organization.
    * @param registrationDto - Data for registering the organization.
    */
-  async registerOrganizationAsync(registrationDto: RegisterOrganizationDto): Promise<RegistrationOrganizationDto> {
+  async registerOrganizationAsync(registrationDto: RegisterOrganizationDto)
+    : Promise<RegistrationOrganizationDto> {
     const existingRequest = await this.registrationRepository.exists({
       where: {
         email: registrationDto.email,

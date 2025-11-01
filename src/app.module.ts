@@ -8,6 +8,7 @@ import { UserModule } from '@modules/user/user.module';
 import { WebThreeModule } from '@modules/web-three/web-three.module';
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
+import { CertificateModule } from './modules/certificate/certificate.module';
 import { MailModule } from './modules/mail/mail.module';
 import { OrganizationModule } from './modules/organization/organization.module';
 import { QueueModule } from './modules/queue/queue.module';
@@ -23,6 +24,7 @@ import { WebhookModule } from './modules/webhook/webhook.module';
     AuthModule,
     UserModule,
     OrganizationModule,
+    CertificateModule,
     MailModule,
     WebThreeModule,
     CronjobModule,
@@ -32,4 +34,4 @@ import { WebhookModule } from './modules/webhook/webhook.module';
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }

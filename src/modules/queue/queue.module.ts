@@ -5,15 +5,18 @@ import { BullModule } from '@nestjs/bullmq';
 import { forwardRef, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import basicAuth from 'express-basic-auth';
+import { CertificateModule } from '../certificate/certificate.module';
 import { MailModule } from '../mail/mail.module';
 import { OrganizationModule } from '../organization/organization.module';
 import { WebThreeModule } from '../web-three/web-three.module';
 import { QueueNames } from './enums';
 import {
+  CertificateTypeEventProcessor,
   OrganizationEventProcessor,
   OrganizationMailProcessor
 } from './processors';
 import {
+  CertificateTypeEventQueueService,
   OrganizationEventQueueService,
   OrganizationMailQueueService
 } from './services';
@@ -22,6 +25,7 @@ import {
   imports: [
     forwardRef(() => WebThreeModule),
     OrganizationModule,
+    CertificateModule,
     MailModule,
     BullModule.forRootAsync({
       inject: [ConfigService],
@@ -34,6 +38,7 @@ import {
     BullModule.registerQueue(
       { name: QueueNames.ORGANIZATION_MAILS },
       { name: QueueNames.ORGANIZATION_EVENTS },
+      { name: QueueNames.CERTIFICATE_TYPE_EVENTS }
     ),
     BullBoardModule.forFeature(
       {
@@ -44,6 +49,10 @@ import {
         name: QueueNames.ORGANIZATION_EVENTS,
         adapter: BullMQAdapter,
       },
+      {
+        name: QueueNames.CERTIFICATE_TYPE_EVENTS,
+        adapter: BullMQAdapter,
+      }
     ),
     BullBoardModule.forRoot({
       route: '/queues',
@@ -58,12 +67,15 @@ import {
   providers: [
     OrganizationMailQueueService,
     OrganizationEventQueueService,
+    CertificateTypeEventQueueService,
     OrganizationMailProcessor,
-    OrganizationEventProcessor
+    OrganizationEventProcessor,
+    CertificateTypeEventProcessor
   ],
   exports: [
     OrganizationMailQueueService,
-    OrganizationEventQueueService
+    OrganizationEventQueueService,
+    CertificateTypeEventQueueService
   ],
 })
 export class QueueModule { }
