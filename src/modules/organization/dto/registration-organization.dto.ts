@@ -13,6 +13,7 @@ export class RegistrationOrganizationDto extends PickType(OrganizationRegistrati
   'countryCode',
   'website',
   'status',
+  'rejectReason',
   'createdAt',
   'updatedAt',
-]) {}
+]) { }
