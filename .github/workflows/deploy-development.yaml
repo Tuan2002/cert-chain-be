@@ -45,5 +45,6 @@ jobs:
       - name: Deploy with Docker
         run: |
           cd ~/app/cert-chain-be
+          docker compose pull
           docker compose down
           docker compose up -d
