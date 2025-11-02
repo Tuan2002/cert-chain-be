@@ -4,3 +4,6 @@ export type CreateCertificateType = {
   name: string;
   description?: string;
 };
+
+export type UpdateCertificateType
+  = {} & CreateCertificateType;

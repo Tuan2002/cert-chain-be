@@ -4,3 +4,13 @@ export interface CertificateTypeCreatedEventJob {
   code: string;
   transactionHash: string;
 }
+
+export interface CertificateTypeUpdatedEventJob
+  extends CertificateTypeCreatedEventJob {
+  description?: string;
+}
+
+export interface CertificateTypeDeactivatedEventJob {
+  certificateTypeId: string;
+  transactionHash: string;
+}

@@ -8,6 +8,7 @@ export class CertificateTypeDto extends PickType(CertificateType, [
   'description',
   'isActive',
   'initTxHash',
+  'lastChangedTxHash',
   'createdAt',
   'updatedAt'
 ]) { }

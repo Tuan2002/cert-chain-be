@@ -10,4 +10,6 @@ export enum OrganizationEventJobs {
 
 export enum CertificateTypeEventJobs {
   CERTIFICATE_TYPE_CREATED = 'certificate-type-created',
+  CERTIFICATE_TYPE_UPDATED = 'certificate-type-updated',
+  CERTIFICATE_TYPE_DEACTIVATED = 'certificate-type-deactivated',
 }

@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
 import { DataSource, Repository } from "typeorm";
 import { CertificateType } from "../entities";
-import { CertificateTypeCreatedEvent } from "../types";
+import { CertificateTypeCreatedEvent, CertificateTypeDeactivatedEvent, CertificateTypeUpdatedEvent } from "../types";
 
 @Injectable()
 export class CertificateTypeTrackerService {
@@ -35,6 +35,52 @@ export class CertificateTypeTrackerService {
     }, {
       isActive: true,
       initTxHash: transactionHash,
+    });
+  }
+
+  async handleCertificateTypeUpdatedEvent(eventData: CertificateTypeUpdatedEvent): Promise<void> {
+    const {
+      certificateTypeId,
+      transactionHash
+    } = eventData;
+
+    const existingType = await this.certificateTypeRepository.findOne({
+      where: {
+        id: certificateTypeId,
+      }
+    });
+
+    if (!existingType) {
+      throw new Error(`Certificate type with ID ${certificateTypeId} not found`);
+    }
+
+    await this.certificateTypeRepository.update({
+      id: certificateTypeId
+    }, {
+      lastChangedTxHash: transactionHash
+    });
+  }
+
+  async handleCertificateTypeDeactivatedEvent(eventData: CertificateTypeDeactivatedEvent): Promise<void> {
+    const {
+      certificateTypeId,
+      transactionHash
+    } = eventData;
+    const existingType = await this.certificateTypeRepository.findOne({
+      where: {
+        id: certificateTypeId,
+      }
+    });
+
+    if (!existingType) {
+      throw new Error(`Certificate type with ID ${certificateTypeId} not found`);
+    }
+
+    await this.certificateTypeRepository.update({
+      id: certificateTypeId
+    }, {
+      isActive: false,
+      lastChangedTxHash: transactionHash,
     });
   }
 }

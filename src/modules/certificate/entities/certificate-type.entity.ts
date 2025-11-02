@@ -63,4 +63,16 @@ export class CertificateType extends AbstractEntity {
     nullable: true,
   })
   initTxHash: string;
+
+  @ApiProperty({
+    description: 'The transaction hash of the last change made to the certificate type on the blockchain',
+    example: '0xdef456ghi789jkl012mno345pqrs678tuv901wxy234zab567cde890fghabc123',
+  })
+  @IsOptional()
+  @IsString()
+  @Expose()
+  @Column({
+    nullable: true,
+  })
+  lastChangedTxHash?: string;
 }

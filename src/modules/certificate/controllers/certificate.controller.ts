@@ -1,7 +1,7 @@
 import { ApiQueryOptions, ApiResponseType, Auth, QueryOptions, RBAC } from '@/base/decorators';
 import { QueryOptionsDto } from '@/base/dtos';
 import { UserRoles } from '@/modules/user/enums';
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CertificateTypeDto, CreateCertificateTypeDto } from '../dto';
 import { CertificateTypeService } from '../services';
@@ -38,8 +38,49 @@ export class CertificateController {
   @ApiResponseType(CertificateTypeDto)
   @Get('types/:id')
   async getCertificateTypeById(
-    @Body('id') certificateTypeId: string
+    @Param('id') certificateTypeId: string
   ) {
     return this.certificateTypeService.getCertificateTypeByIdAsync(certificateTypeId);
+  }
+
+  @ApiOperation({ summary: 'Update certificate type' })
+  @ApiResponseType(CertificateTypeDto)
+  @Put('types/:id/update')
+  @RBAC(UserRoles.ADMIN)
+  async updateCertificateType(
+    @Param('id') certificateTypeId: string,
+    @Body() updateTypeDto: CreateCertificateTypeDto
+  ) {
+    return this.certificateTypeService.updateCertificateTypeAsync(certificateTypeId, updateTypeDto);
+  }
+
+  @ApiOperation({ summary: 'Activate certificate type' })
+  @ApiResponseType(CertificateTypeDto)
+  @Put('types/:id/activate')
+  @RBAC(UserRoles.ADMIN)
+  async activateCertificateType(
+    @Param('id') certificateTypeId: string,
+  ) {
+    return this.certificateTypeService.reactivateCertificateTypeAsync(certificateTypeId);
+  }
+
+  @ApiOperation({ summary: 'Deactivate certificate type' })
+  @ApiResponseType(CertificateTypeDto)
+  @Put('types/:id/deactivate')
+  @RBAC(UserRoles.ADMIN)
+  async deactivateCertificateType(
+    @Param('id') certificateTypeId: string,
+  ) {
+    return this.certificateTypeService.deactivateCertificateTypeAsync(certificateTypeId);
+  }
+
+  @ApiOperation({ summary: 'Delete certificate type' })
+  @ApiResponseType(CertificateTypeDto)
+  @Delete('types/:id/delete')
+  @RBAC(UserRoles.ADMIN)
+  async deleteCertificateType(
+    @Param('id') certificateTypeId: string,
+  ) {
+    return this.certificateTypeService.deleteCertificateTypeAsync(certificateTypeId);
   }
 }

@@ -4,4 +4,6 @@ export enum OrganizationJobPrefix {
 
 export enum CertificateTypeJobPrefix {
   CERTIFICATE_TYPE_ADDED = "CT_ADDED",
+  CERTIFICATE_TYPE_UPDATED = "CT_UPDATED",
+  CERTIFICATE_TYPE_DEACTIVATED = "CT_DEACTIVATED",
 }

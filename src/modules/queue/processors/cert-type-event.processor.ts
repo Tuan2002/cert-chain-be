@@ -3,7 +3,7 @@ import { Processor, WorkerHost } from "@nestjs/bullmq";
 import { Logger } from "@nestjs/common";
 import { Job } from "bullmq";
 import { CertificateTypeEventJobs, QueueNames } from "../enums";
-import { CertificateTypeCreatedEventJob } from "../interfaces";
+import { CertificateTypeCreatedEventJob, CertificateTypeDeactivatedEventJob, CertificateTypeUpdatedEventJob } from "../interfaces";
 
 @Processor(QueueNames.CERTIFICATE_TYPE_EVENTS)
 export class CertificateTypeEventProcessor extends WorkerHost {
@@ -39,5 +39,41 @@ export class CertificateTypeEventProcessor extends WorkerHost {
     });
 
     this.logger.log(`Processed certificate type created event for ID: ${certificateTypeId}`);
+  }
+
+  async handleCertificateTypeUpdatedJob(eventData: CertificateTypeUpdatedEventJob): Promise<void> {
+    const {
+      certificateTypeId,
+      code,
+      name,
+      description,
+      transactionHash
+    } = eventData;
+    this.logger.log(`Processing certificate type updated event for ID: ${certificateTypeId}`);
+
+    await this.certTypeTrackerService.handleCertificateTypeUpdatedEvent({
+      certificateTypeId,
+      name,
+      code,
+      description,
+      transactionHash,
+    });
+
+    this.logger.log(`Processed certificate type updated event for ID: ${certificateTypeId}`);
+  }
+
+  async handleCertificateTypeDeactivatedJob(eventData: CertificateTypeDeactivatedEventJob): Promise<void> {
+    const {
+      certificateTypeId,
+      transactionHash
+    } = eventData;
+    this.logger.log(`Processing certificate type deactivated event for ID: ${certificateTypeId}`);
+
+    await this.certTypeTrackerService.handleCertificateTypeDeactivatedEvent({
+      certificateTypeId,
+      transactionHash,
+    });
+
+    this.logger.log(`Processed certificate type deactivated event for ID: ${certificateTypeId}`);
   }
 }

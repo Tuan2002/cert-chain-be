@@ -4,3 +4,12 @@ export type CertificateTypeCreatedEvent = {
   code: string;
   transactionHash: string;
 }
+
+export type CertificateTypeUpdatedEvent = CertificateTypeCreatedEvent & {
+  description?: string;
+}
+
+export type CertificateTypeDeactivatedEvent = {
+  certificateTypeId: string;
+  transactionHash: string;
+}
