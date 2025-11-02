@@ -18,7 +18,13 @@ export class CertificateTypeEventProcessor extends WorkerHost {
   async process(job: Job): Promise<void> {
     switch (job.name) {
       case CertificateTypeEventJobs.CERTIFICATE_TYPE_CREATED:
-        await this.handleCertificateTypeCreatedJob(job.data);
+        return this.handleCertificateTypeCreatedJob(job.data);
+
+      case CertificateTypeEventJobs.CERTIFICATE_TYPE_UPDATED:
+        return this.handleCertificateTypeUpdatedJob(job.data);
+
+      case CertificateTypeEventJobs.CERTIFICATE_TYPE_DEACTIVATED:
+        return this.handleCertificateTypeDeactivatedJob(job.data);
     }
   }
 

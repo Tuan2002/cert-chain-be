@@ -149,13 +149,13 @@ export class CertificateTypeService {
   async reactivateCertificateTypeAsync(certificateTypeId: string): Promise<{
     certificateTypeId: string;
   }> {
-    const existingType = await this.certificateTypeRepository.exists({
+    const existingType = await this.certificateTypeRepository.findOne({
       where: { id: certificateTypeId }
     });
 
-    if (!existingType) {
+    if (!existingType || existingType.isActive) {
       throw new BadRequestException({
-        message: 'Certificate type not found',
+        message: 'Certificate type not found or already active',
         code: CertificateTypeErrorCode.CERTIFICATE_TYPE_NOT_FOUND
       });
     }
@@ -176,15 +176,15 @@ export class CertificateTypeService {
   async deactivateCertificateTypeAsync(certificateTypeId: string): Promise<{
     certificateTypeId: string;
   }> {
-    const existingType = await this.certificateTypeRepository.exists({
+    const existingType = await this.certificateTypeRepository.findOne({
       where: {
         id: certificateTypeId
       }
     });
 
-    if (!existingType) {
+    if (!existingType || !existingType.isActive) {
       throw new BadRequestException({
-        message: 'Certificate type not found',
+        message: 'Certificate type not found or already deactivated',
         code: CertificateTypeErrorCode.CERTIFICATE_TYPE_NOT_FOUND
       });
     }
