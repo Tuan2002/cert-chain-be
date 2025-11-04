@@ -7,6 +7,7 @@ import { DiscoveryModule } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ContractEventLoader } from './providers';
 import {
+  CertificateContractService,
   CertificateTypeContractService,
   OrganizationContractService
 } from './services';
@@ -23,11 +24,13 @@ import {
   providers: [
     OrganizationContractService,
     CertificateTypeContractService,
+    CertificateContractService,
     ContractEventLoader
   ],
   exports: [
     OrganizationContractService,
     CertificateTypeContractService,
+    CertificateContractService
   ],
 })
 export class WebThreeModule { }

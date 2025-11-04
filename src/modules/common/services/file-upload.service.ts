@@ -1,47 +1,69 @@
-import { StorageFolders } from '@base/enums';
-import { AuthorizedContext } from '@modules/auth/types';
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { plainToInstance } from 'class-transformer';
-import { Repository } from 'typeorm';
-import { FileResponseDto } from '../dto';
-import { FileUpload } from '../entities';
-import { FileUploadStatus } from '../enums';
+import { BucketFolders } from '@/enums';
+import { S3FileService } from '@/modules/third-party/services';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import slug from 'slug';
+import { CommonErrorCode } from '../constants';
+import {
+  FileUploadResponseDto,
+  UploadAuthorDocumentDto,
+  UploadAuthorImageDto,
+  UploadAvatarDto
+} from '../dto';
 
 @Injectable()
 export class FileUploadService {
   constructor(
-    @InjectRepository(FileUpload)
-    private readonly fileUploadRepository: Repository<FileUpload>,
-  ) {}
+    private readonly s3FileService: S3FileService,
+  ) { }
 
-  public async createFileUploadAsync(
-    fileData: Express.MulterS3.File,
-    storageFolder: StorageFolders,
-    context: AuthorizedContext,
-  ): Promise<FileResponseDto> {
-    const publicEndpoint =
-      process.env.DO_SPACE_CDN_ENDPOINT ?? process.env.DO_SPACE_ENDPOINT;
-    const fileUpload = this.fileUploadRepository.create({
-      originalName: fileData.originalname,
-      bucketName: fileData.bucket,
-      fileKey: fileData.key,
-      mimeType: fileData.mimetype,
-      size: fileData.size,
-      storageFolder: storageFolder,
-      uploaderId: context.userId,
-      status: FileUploadStatus.UPLOADED,
+  async generateUploadAvatarUrl(fileMetadata: UploadAvatarDto): Promise<FileUploadResponseDto> {
+    const { fileName, fileType, fileSize } = fileMetadata;
+    const [originalName, fileExt] = fileName.split('.')
+    const fileKey = `${BucketFolders.USER_AVATARS}/${slug(originalName)}-${Date.now()}.${fileExt}`;
+    const presignedData = await this.s3FileService.generateUploadUrl({
+      fileKey,
+      fileType,
+      fileSize
+    }).catch(() => {
+      throw new BadRequestException({
+        message: 'Failed to generate upload URL',
+        code: CommonErrorCode.UPLOAD_FAILED
+      })
     });
-    const savedFileUpload = await this.fileUploadRepository.save(fileUpload);
-    return plainToInstance(
-      FileResponseDto,
-      {
-        ...savedFileUpload,
-        publicUrl: `${publicEndpoint}/${savedFileUpload.bucketName}/${savedFileUpload.fileKey}`,
-      },
-      {
-        excludeExtraneousValues: true,
-      },
-    );
+    return presignedData;
+  }
+
+  async generateUploadAuthorUrl(fileMetadata: UploadAuthorImageDto): Promise<FileUploadResponseDto> {
+    const { fileName, fileType, fileSize } = fileMetadata;
+    const [originalName, fileExt] = fileName.split('.')
+    const fileKey = `${BucketFolders.AUTHOR_IMAGES}/${slug(originalName)}-${Date.now()}.${fileExt}`;
+    const presignedData = await this.s3FileService.generateUploadUrl({
+      fileKey,
+      fileType,
+      fileSize
+    }).catch(() => {
+      throw new BadRequestException({
+        message: 'Failed to generate upload URL',
+        code: CommonErrorCode.UPLOAD_FAILED
+      })
+    });
+    return presignedData;
+  }
+
+  async generateUploadAuthorDocsUrl(fileMetadata: UploadAuthorDocumentDto): Promise<FileUploadResponseDto> {
+    const { fileName, fileType, fileSize } = fileMetadata;
+    const [originalName, fileExt] = fileName.split('.')
+    const fileKey = `${BucketFolders.AUTHOR_DOCUMENTS}/${slug(originalName)}-${Date.now()}.${fileExt}`;
+    const presignedData = await this.s3FileService.generateUploadUrl({
+      fileKey,
+      fileType,
+      fileSize
+    }).catch(() => {
+      throw new BadRequestException({
+        message: 'Failed to generate upload URL',
+        code: CommonErrorCode.UPLOAD_FAILED
+      })
+    });
+    return presignedData;
   }
 }

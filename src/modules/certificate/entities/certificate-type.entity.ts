@@ -2,8 +2,9 @@ import { AbstractEntity } from "@/base/entities/base.entity";
 import { Tables } from "@/enums/tables.enum";
 import { ApiProperty } from "@nestjs/swagger";
 import { Expose } from "class-transformer";
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { Column, Entity } from "typeorm";
+import { IsAlphanumeric, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { Column, Entity, OneToMany } from "typeorm";
+import { Certificate } from "./certificate.entity";
 
 @Entity(Tables.CertificateType)
 export class CertificateType extends AbstractEntity {
@@ -12,6 +13,7 @@ export class CertificateType extends AbstractEntity {
     example: 'ENG_01',
   })
   @IsNotEmpty()
+  @IsAlphanumeric()
   @IsString()
   @Expose()
   @Column({
@@ -75,4 +77,8 @@ export class CertificateType extends AbstractEntity {
     nullable: true,
   })
   lastChangedTxHash?: string;
+
+  // Relations
+  @OneToMany(() => Certificate, (certificate) => certificate.certificateType)
+  certificates: Certificate[];
 }

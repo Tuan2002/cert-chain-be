@@ -1,7 +1,7 @@
 import { Tables } from '@/enums/tables.enum';
+import { Certificate } from '@/modules/certificate/entities';
 import { OrganizationMember } from '@/modules/organization/entities';
 import { AbstractEntity } from '@base/entities/base.entity';
-import { FileUpload } from '@modules/common/entities';
 import { Genders } from '@modules/user/enums';
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
@@ -101,9 +101,9 @@ export class User extends AbstractEntity {
   @Column({ nullable: true })
   dob?: Date;
 
-  @ApiProperty({ 
-    nullable: true, 
-    enum: Genders, 
+  @ApiProperty({
+    nullable: true,
+    enum: Genders,
     enumName: 'Gender'
   })
   @IsOptional()
@@ -121,10 +121,9 @@ export class User extends AbstractEntity {
   })
   avatar?: string;
 
-  // Relations
-  @OneToMany(() => FileUpload, (fileUpload) => fileUpload.uploader)
-  fileUploads: FileUpload[];
-
   @OneToMany(() => OrganizationMember, (member) => member.user)
   organizationMembers: OrganizationMember[];
+
+  @OneToMany(() => Certificate, (certificate) => certificate.issuer)
+  issuedCertificates: Certificate[];
 }

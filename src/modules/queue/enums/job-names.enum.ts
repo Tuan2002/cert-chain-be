@@ -13,3 +13,7 @@ export enum CertificateTypeEventJobs {
   CERTIFICATE_TYPE_UPDATED = 'certificate-type-updated',
   CERTIFICATE_TYPE_DEACTIVATED = 'certificate-type-deactivated',
 }
+
+export enum CertificateEventJobs {
+  CERTIFICATE_SIGNED = 'certificate-signed',
+}

@@ -14,12 +14,12 @@ export class IPFSService {
   }
 
   /**
-   * Uploads a file to IPFS and returns the upload response.
+   * Uploads a data object to IPFS and returns the upload response.
    * @param fileBuffer - The file buffer to upload.
    * @returns A promise that resolves to the IPFS upload response.
    * @throws InternalServerErrorException if the upload fails.
    */
-  async uploadFileAsync(fileBuffer: Buffer): Promise<IPFSUploadResponse> {
+  async uploadDataAsync(fileBuffer: Buffer): Promise<IPFSUploadResponse> {
     const formData = new FormData();
     formData.append('file', Buffer.from(fileBuffer), {
       filename: 'file',

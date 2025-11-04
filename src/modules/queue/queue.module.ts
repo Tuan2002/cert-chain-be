@@ -16,6 +16,7 @@ import {
   OrganizationMailProcessor
 } from './processors';
 import {
+  CertificateEventQueueService,
   CertificateTypeEventQueueService,
   OrganizationEventQueueService,
   OrganizationMailQueueService
@@ -38,7 +39,8 @@ import {
     BullModule.registerQueue(
       { name: QueueNames.ORGANIZATION_MAILS },
       { name: QueueNames.ORGANIZATION_EVENTS },
-      { name: QueueNames.CERTIFICATE_TYPE_EVENTS }
+      { name: QueueNames.CERTIFICATE_TYPE_EVENTS },
+      { name: QueueNames.CERTIFICATE_EVENTS }
     ),
     BullBoardModule.forFeature(
       {
@@ -51,6 +53,10 @@ import {
       },
       {
         name: QueueNames.CERTIFICATE_TYPE_EVENTS,
+        adapter: BullMQAdapter,
+      },
+      {
+        name: QueueNames.CERTIFICATE_EVENTS,
         adapter: BullMQAdapter,
       }
     ),
@@ -68,6 +74,7 @@ import {
     OrganizationMailQueueService,
     OrganizationEventQueueService,
     CertificateTypeEventQueueService,
+    CertificateEventQueueService,
     OrganizationMailProcessor,
     OrganizationEventProcessor,
     CertificateTypeEventProcessor
@@ -75,7 +82,8 @@ import {
   exports: [
     OrganizationMailQueueService,
     OrganizationEventQueueService,
-    CertificateTypeEventQueueService
+    CertificateTypeEventQueueService,
+    CertificateEventQueueService
   ],
 })
 export class QueueModule { }

@@ -1,9 +1,18 @@
 import { WebThreeModule } from "@modules/web-three/web-three.module";
 import { forwardRef, Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { ThirdPartyModule } from "../third-party/third-party.module";
+import { User } from "../user/entities";
 import { CertificateController } from "./controllers";
-import { CertificateType } from "./entities";
 import {
+  Certificate,
+  CertificateProfile,
+  CertificateRequest,
+  CertificateType
+} from "./entities";
+import {
+  CertificateService,
+  CertificateTrackerService,
   CertificateTypeService,
   CertificateTypeTrackerService
 } from "./services";
@@ -11,19 +20,27 @@ import {
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      CertificateType
+      CertificateType,
+      Certificate,
+      CertificateProfile,
+      CertificateRequest,
+      User
     ]),
-    forwardRef(() => WebThreeModule)
+    forwardRef(() => WebThreeModule),
+    ThirdPartyModule
   ],
   controllers: [
     CertificateController
   ],
   providers: [
+    CertificateService,
     CertificateTypeService,
-    CertificateTypeTrackerService
+    CertificateTypeTrackerService,
+    CertificateTrackerService
   ],
   exports: [
-    CertificateTypeTrackerService
+    CertificateTypeTrackerService,
+    CertificateTrackerService
   ],
 })
 export class CertificateModule { }

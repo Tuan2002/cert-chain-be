@@ -2,7 +2,7 @@ import { AbstractEntity } from "@/base/entities/base.entity";
 import { Tables } from "@/enums/tables.enum";
 import { ApiProperty } from "@nestjs/swagger";
 import { Expose } from "class-transformer";
-import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsEmail, IsEnum, IsEthereumAddress, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { Column, Entity } from "typeorm";
 import { RegistrationStatus } from "../enums/registration-status.enum";
 
@@ -13,7 +13,7 @@ export class OrganizationRegistration extends AbstractEntity {
     example: '0xd48AB4C6fDf56f05E8237885eB040e9670d0feeb',
   })
   @IsNotEmpty()
-  @IsString()
+  @IsEthereumAddress()
   @Expose()
   @Column()
   walletAddress: string;

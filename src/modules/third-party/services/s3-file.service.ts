@@ -1,53 +1,55 @@
-import { GetObjectCommand, S3, S3Client } from '@aws-sdk/client-s3';
+import { StoragePermission } from '@/base/enums';
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { SecurityOptions } from '@constants';
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { UploadParamDto } from '../dto';
+import { PresignedUploadData } from '../types';
 
 @Injectable()
 export class S3FileService {
   private s3Client: S3Client;
-  private s3: S3;
-  constructor() {
+  constructor(
+    private readonly configService: ConfigService,
+  ) {
     this.s3Client = new S3Client({
-      endpoint: process.env.DO_SPACE_ENDPOINT,
+      endpoint: this.configService.getOrThrow<string>('S3_API_ENDPOINT'),
       credentials: {
-        accessKeyId: process.env.DO_SPACE_ACCESS_KEY,
-        secretAccessKey: process.env.DO_SPACE_SECRET_KEY,
+        accessKeyId: this.configService.getOrThrow<string>('S3_ACCESS_KEY_ID'),
+        secretAccessKey: this.configService.getOrThrow<string>('S3_SECRET_ACCESS_KEY'),
       },
-      region: process.env.DO_SPACE_REGION,
-    });
-
-    this.s3 = new S3({
-      endpoint: process.env.DO_SPACE_ENDPOINT,
-      credentials: {
-        accessKeyId: process.env.DO_SPACE_ACCESS_KEY,
-        secretAccessKey: process.env.DO_SPACE_SECRET_KEY,
-      },
-      region: process.env.DO_SPACE_REGION,
+      region: this.configService.get<string>('S3_REGION') || 'us-east-1',
+      forcePathStyle: true
     });
   }
 
-  async generateSignedUrlAsync(fileKey: string, expiresIn?: number) {
-    const command = new GetObjectCommand({
-      Bucket: process.env.DO_SPACE_BUCKET_NAME,
-      Key: fileKey,
+  async generateUploadUrl(
+    uploadParams: UploadParamDto,
+    expiresIn?: number,
+    permission: StoragePermission = StoragePermission.PUBLIC,
+  ): Promise<PresignedUploadData> {
+    const bucketEndpoint = this.configService.getOrThrow<string>('S3_API_ENDPOINT');
+    const cdnEndpoint = this.configService.getOrThrow<string>('S3_CDN_ENDPOINT');
+    const bucketName = this.configService.getOrThrow<string>('S3_BUCKET_NAME');
+    const command = new PutObjectCommand({
+      Bucket: bucketName,
+      Key: uploadParams.fileKey,
+      ACL: permission,
+      ContentType: uploadParams.fileType,
+      ContentLength: uploadParams.fileSize
     });
 
-    const signedUrl = await getSignedUrl(this.s3Client, command, {
+    const uploadUrl = await getSignedUrl(this.s3Client, command, {
       expiresIn: expiresIn || SecurityOptions.FILE_SIGN_TIME,
     });
 
-    return signedUrl;
-  }
-
-  async getFileStreamAsync(fileKey: string) {
-    const { Body } = await this.s3.getObject({
-      Bucket: process.env.DO_SPACE_BUCKET_NAME,
-      Key: fileKey,
-    });
-    if (!Body) {
-      return null;
+    const accessUrl = cdnEndpoint
+      ? `${cdnEndpoint}/${uploadParams.fileKey}`
+      : `${bucketEndpoint}/${bucketName}/${uploadParams.fileKey}`;
+    return {
+      uploadUrl,
+      accessUrl,
     }
-    return await Body.transformToByteArray();
   }
 }
