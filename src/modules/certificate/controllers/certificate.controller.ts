@@ -4,7 +4,7 @@ import { AuthorizedContext } from '@/modules/auth/types';
 import { UserRoles } from '@/modules/user/enums';
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { BaseCertificateDto, CertificateTypeDto, CreateCertificateDto, CreateCertificateTypeDto } from '../dto';
+import { BaseCertificateDto, CertificateDto, CertificateTypeDto, CreateCertificateDto, CreateCertificateTypeDto } from '../dto';
 import { CertificateService, CertificateTypeService } from '../services';
 
 @ApiTags('Certificates')
@@ -101,7 +101,7 @@ export class CertificateController {
   @ApiOperation({
     summary: 'Get all certificates with pagination',
   })
-  @ApiResponseType(BaseCertificateDto,
+  @ApiResponseType(CertificateDto,
     { isArray: true, hasPagination: true }
   )
   @ApiBodyQueryOptions()
@@ -112,7 +112,7 @@ export class CertificateController {
   }
 
   @ApiOperation({ summary: 'Get certificates of an organization with pagination' })
-  @ApiResponseType(BaseCertificateDto,
+  @ApiResponseType(CertificateDto,
     { isArray: true, hasPagination: true }
   )
   @ApiBodyQueryOptions()
@@ -126,7 +126,7 @@ export class CertificateController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get certificate by id' })
-  @ApiResponseType(BaseCertificateDto)
+  @ApiResponseType(CertificateDto)
   async getCertificateById(
     @Param('id') id: string
   ) {

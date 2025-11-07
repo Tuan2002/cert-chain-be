@@ -104,7 +104,7 @@ export class CertificateService {
           ...parseFilterQuery<Certificate>(filters)
         },
         order: sort ? parseSortQuery<Certificate>(sort) : { createdAt: 'DESC' },
-        relations: ['certificateType']
+        relations: ['certificateType', 'certificateProfile']
       });
 
     const resPagination = getPagination({
