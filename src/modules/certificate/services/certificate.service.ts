@@ -113,7 +113,10 @@ export class CertificateService {
     });
 
     const certificates = rawCertificates.map((certificate) =>
-      plainToInstance(CertificateDto, certificate, {
+      plainToInstance(CertificateDto, {
+        ...certificate,
+        authorProfile: certificate.certificateProfile
+      }, {
         excludeExtraneousValues: true,
       }),
     );
@@ -127,6 +130,27 @@ export class CertificateService {
   async getCertificateByIdAsync(id: string): Promise<CertificateDto> {
     const certificate = await this.certificateRepository.findOne({
       where: { id },
+      relations: ['certificateType', 'certificateProfile']
+    });
+
+    if (!certificate) {
+      throw new BadRequestException({
+        message: 'Certificate not found',
+        code: CertificateErrorCode.CERTIFICATE_NOT_FOUND
+      });
+    }
+
+    return plainToInstance(CertificateDto, {
+      ...certificate,
+      authorProfile: certificate.certificateProfile
+    }, {
+      excludeExtraneousValues: true
+    });
+  }
+
+  async getCertificateByCodeAsync(code: string): Promise<CertificateDto> {
+    const certificate = await this.certificateRepository.findOne({
+      where: { code },
       relations: ['certificateType', 'certificateProfile']
     });
 
