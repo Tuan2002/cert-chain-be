@@ -11,6 +11,7 @@ import { OrganizationModule } from '../organization/organization.module';
 import { WebThreeModule } from '../web-three/web-three.module';
 import { QueueNames } from './enums';
 import {
+  CertificateEventProcessor,
   CertificateTypeEventProcessor,
   OrganizationEventProcessor,
   OrganizationMailProcessor
@@ -77,7 +78,8 @@ import {
     CertificateEventQueueService,
     OrganizationMailProcessor,
     OrganizationEventProcessor,
-    CertificateTypeEventProcessor
+    CertificateTypeEventProcessor,
+    CertificateEventProcessor
   ],
   exports: [
     OrganizationMailQueueService,

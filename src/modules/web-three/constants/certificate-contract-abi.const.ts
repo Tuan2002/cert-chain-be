@@ -4,7 +4,5 @@ export const CERTIFICATE_CONTRACT_ABI = [
   'event CertificateApproved(string id, address approvedBy)',
   'event CertificateRejected(string id, address rejectedBy, string reason)',
   'event CertificateRevoked(string id, address revokedBy, string reason)',
-  'event CertificateRemoved(string id, address removedBy)',
-
-  // Functions
+  'event CertificateRemoved(string id, address removedBy)'
 ];
