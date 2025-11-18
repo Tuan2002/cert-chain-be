@@ -5,7 +5,7 @@ import { Job } from "bullmq";
 import { CertificateEventJobs, QueueNames } from "../enums";
 import { CertificateSignedEventJob } from "../interfaces";
 
-@Processor(QueueNames.CERTIFICATE_TYPE_EVENTS)
+@Processor(QueueNames.CERTIFICATE_EVENTS)
 export class CertificateEventProcessor extends WorkerHost {
   private readonly logger = new Logger(CertificateEventProcessor.name);
 
