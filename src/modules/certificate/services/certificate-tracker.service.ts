@@ -31,7 +31,7 @@ export class CertificateTrackerService {
     }
 
     await this.certificateRepository.update({
-      id: certificateId
+      id: existingCert.id
     }, {
       status: CertificateStatus.SIGNED,
       signedTxHash: transactionHash
