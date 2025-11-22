@@ -22,7 +22,7 @@ export class CertificateTrackerService {
 
     const existingCert = await this.certificateRepository.findOneOrFail({
       where: {
-        id: certificateId,
+        code: certificateId,
       }
     });
 
