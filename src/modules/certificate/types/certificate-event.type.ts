@@ -6,3 +6,8 @@ export type CertificateSignedEvent = {
   subnmitterAddress: string;
   transactionHash: string;
 }
+
+export type CertificateApprovedEvent = {
+  certificateId: string;
+  transactionHash: string;
+}

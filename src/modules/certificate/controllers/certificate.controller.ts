@@ -4,15 +4,17 @@ import { AuthorizedContext } from '@/modules/auth/types';
 import { UserRoles } from '@/modules/user/enums';
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { BaseCertificateDto, CertificateDto, CertificateTypeDto, CreateCertificateDto, CreateCertificateTypeDto } from '../dto';
-import { CertificateService, CertificateTypeService } from '../services';
+import { BaseCertificateDto, CertificateDto, CertificateRequestDto, CertificateTypeDto, CreateCertificateDto, CreateCertificateTypeDto, RequestCertificateDto } from '../dto';
+import { CertificateRequestService, CertificateService, CertificateTypeService } from '../services';
 
 @ApiTags('Certificates')
 @Controller('certificates')
+@Auth()
 export class CertificateController {
   constructor(
     private readonly certificateTypeService: CertificateTypeService,
-    private readonly certificateService: CertificateService
+    private readonly certificateService: CertificateService,
+    private readonly certificateRequestService: CertificateRequestService
   ) { }
 
   @ApiOperation({ summary: 'Create a new certificate type' })
@@ -28,7 +30,6 @@ export class CertificateController {
   @ApiOperation({ summary: 'Get certificate types' })
   @ApiQueryOptions()
   @ApiResponseType(CertificateTypeDto, { isArray: true })
-  @Auth()
   @Get('types/get-types')
   async getCertificateTypes(
     @QueryOptions() queryOptionsDto: QueryOptionsDto
@@ -39,7 +40,6 @@ export class CertificateController {
   @ApiOperation({ summary: 'Get certificate type by ID' })
   @ApiResponseType(CertificateTypeDto)
   @Get('types/:id')
-  @Auth()
   async getCertificateTypeById(
     @Param('id') certificateTypeId: string
   ) {
@@ -50,7 +50,6 @@ export class CertificateController {
   @ApiResponseType(CertificateTypeDto)
   @Put('types/:id/update')
   @RBAC(UserRoles.ADMIN)
-  @Auth()
   async updateCertificateType(
     @Param('id') certificateTypeId: string,
     @Body() updateTypeDto: CreateCertificateTypeDto
@@ -91,7 +90,6 @@ export class CertificateController {
   @Post('create-certificate')
   @ApiOperation({ summary: 'Create a new certificate' })
   @ApiResponseType(BaseCertificateDto)
-  @Auth()
   async createCertificate(
     @Body() certificateData: CreateCertificateDto,
     @UserRequest() context: AuthorizedContext
@@ -101,7 +99,6 @@ export class CertificateController {
 
   @Post('get-certificates')
   // @RBAC(UserRoles.ADMIN)
-  @Auth()
   @ApiOperation({
     summary: 'Get all certificates with pagination',
   })
@@ -121,7 +118,6 @@ export class CertificateController {
   )
   @ApiBodyQueryOptions()
   @Post('organization-certificates/:id')
-  @Auth()
   async getOrganizationCertificates(
     @Body() queryOptionsDto: QueryOptionsDto,
     @Param('id') organizationId: string
@@ -132,19 +128,62 @@ export class CertificateController {
   @ApiOperation({ summary: 'Get certificate by id' })
   @ApiResponseType(CertificateDto)
   @Get('by-id/:id')
-  @Auth()
   async getCertificateById(
     @Param('id') id: string
   ) {
     return this.certificateService.getCertificateByIdAsync(id);
   }
 
-  @ApiOperation({ summary: 'Get certificate by code' })
-  @ApiResponseType(CertificateDto)
-  @Get('by-code/:code')
-  async getCertificateByCode(
-    @Param('code') code: string
+  @ApiOperation({ summary: 'Submit certificate for verification or revocation' })
+  @Post('submit-certificate')
+  @ApiResponseType(CertificateRequestDto)
+  async submitCertificate(
+    @Body() requestData: RequestCertificateDto
   ) {
-    return this.certificateService.getCertificateByCodeAsync(code);
+    return this.certificateRequestService.createCertificateRequest(requestData);
+  }
+
+  @ApiOperation({ summary: 'Get certificate requests with pagination' })
+  @ApiResponseType(CertificateRequestDto,
+    { isArray: true, hasPagination: true }
+  )
+  @ApiBodyQueryOptions()
+  @RBAC(UserRoles.ADMIN)
+  @Post('certificate-requests')
+  async getCertificateRequests(
+    @Body() queryOptionsDto: QueryOptionsDto,
+  ) {
+    return this.certificateRequestService.getCertificateRequests(queryOptionsDto);
+  }
+
+  @ApiOperation({ summary: 'Get certificate requests for a specific certificate with pagination' })
+  @ApiResponseType(CertificateRequestDto,
+    { isArray: true, hasPagination: true }
+  )
+  @ApiBodyQueryOptions()
+  @Post('certificate-requests/:id/certificate')
+  async getCertificateRequestsByCertificateId(
+    @Body() queryOptionsDto: QueryOptionsDto,
+    @Param('id') certificateId: string
+  ) {
+    return this.certificateRequestService.getCertificateRequests(queryOptionsDto, certificateId);
+  }
+
+  @ApiOperation({ summary: 'Get certificate request by id' })
+  @ApiResponseType(CertificateRequestDto)
+  @Get('certificate-requests/:id')
+  async getCertificateRequestById(
+    @Param('id') id: string
+  ) {
+    return this.certificateRequestService.getCertificateRequestById(id);
+  }
+
+  @ApiOperation({ summary: 'Approve certificate request' })
+  @Put('certificate-requests/:id/approve')
+  @RBAC(UserRoles.ADMIN)
+  async approveCertificateRequest(
+    @Param('id') certificateRequestId: string
+  ) {
+    return this.certificateRequestService.approveCertificateRequest(certificateRequestId);
   }
 }

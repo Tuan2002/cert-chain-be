@@ -52,4 +52,24 @@ export class CertificateContractService extends BaseContractService {
       transactionHash: _event.log.transactionHash,
     });
   }
+
+  async approveCertificateRequestAsync(certificateId: string): Promise<void> {
+    const signedWallet = await this.createWallet(
+      ContractConfigKey.OWNER_WALLET_KEY,
+    );
+    const signedContract = await this.createSignedContract(
+      CERTIFICATE_CONTRACT_ABI,
+      signedWallet,
+    );
+
+    return this.executeContractMethod(
+      signedContract.approveCertificate(
+        certificateId
+      ),
+      {
+        errorMessage: 'Failed to approve certificate request on-chain',
+      },
+    );
+
+  }
 }

@@ -6,3 +6,8 @@ export interface CertificateSignedEventJob {
   subnmitterAddress: string;
   transactionHash: string;
 }
+
+export interface CertificateApprovedEventJob {
+  certificateId: string;
+  transactionHash: string;
+}

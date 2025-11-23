@@ -1,9 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
+import dayjs from "dayjs";
 import { DataSource, Repository } from "typeorm";
 import { Certificate } from "../entities";
 import { CertificateStatus } from "../enums";
-import { CertificateSignedEvent } from "../types";
+import { CertificateApprovedEvent, CertificateSignedEvent } from "../types";
 
 @Injectable()
 export class CertificateTrackerService {
@@ -34,7 +35,32 @@ export class CertificateTrackerService {
       id: existingCert.id
     }, {
       status: CertificateStatus.SIGNED,
-      signedTxHash: transactionHash
+      approvedTxHash: transactionHash,
+      approvedAt: dayjs().toDate(),
+    });
+  }
+
+  async handleCertificateApprovedEvent(eventData: CertificateApprovedEvent): Promise<void> {
+    const {
+      certificateId,
+      transactionHash
+    } = eventData;
+
+    const existingCert = await this.certificateRepository.findOneOrFail({
+      where: {
+        code: certificateId,
+      }
+    });
+
+    if (existingCert.status === CertificateStatus.VERIFIED) {
+      return;
+    }
+
+    await this.certificateRepository.update({
+      id: existingCert.id
+    }, {
+      status: CertificateStatus.VERIFIED,
+      approvedTxHash: transactionHash
     });
   }
 }

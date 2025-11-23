@@ -4,7 +4,7 @@ import { Organization } from "@/modules/organization/entities";
 import { ApiProperty } from "@nestjs/swagger";
 import { Expose } from "class-transformer";
 import { IsEnum, IsNotEmpty, IsString } from "class-validator";
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import { RequestStatus, RequestType } from "../enums";
 import { Certificate } from "./certificate.entity";
 
@@ -12,6 +12,7 @@ import { Certificate } from "./certificate.entity";
 export class CertificateRequest extends AbstractEntity {
   @ApiProperty({
     description: 'The type of the certificate request',
+    enum: RequestType,
     example: RequestType.SIGNUP,
   })
   @IsNotEmpty()
@@ -42,6 +43,7 @@ export class CertificateRequest extends AbstractEntity {
   @IsNotEmpty()
   @Expose()
   @Column()
+  @CreateDateColumn({ type: 'timestamptz' })
   requestedTime: Date;
 
   @ApiProperty({

@@ -11,6 +11,7 @@ import {
   CertificateType
 } from "./entities";
 import {
+  CertificateRequestService,
   CertificateService,
   CertificateTrackerService,
   CertificateTypeService,
@@ -36,7 +37,8 @@ import {
     CertificateService,
     CertificateTypeService,
     CertificateTypeTrackerService,
-    CertificateTrackerService
+    CertificateTrackerService,
+    CertificateRequestService
   ],
   exports: [
     CertificateTypeTrackerService,

@@ -12,3 +12,10 @@ export enum CertificateErrorCode {
   INVALID_CERTIFICATE_TYPE = 'invalid_certificate_type',
   INVALID_ORGANIZATION = 'invalid_organization'
 }
+
+export enum CertificateRequestErrorCode {
+  CERTIFICATE_REQUEST_NOT_FOUND = 'certificate_request_not_found',
+  HAVE_PENDING_CERTIFICATE_REQUEST = 'have_pending_certificate_request',
+  INVALID_CERTIFICATE_REQUEST_STATUS = 'invalid_certificate_request_status',
+  CERTIFICATE_REQUEST_ALREADY_EXISTS = 'certificate_request_already_exists',
+}
