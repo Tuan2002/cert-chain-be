@@ -9,5 +9,7 @@ export class CertificateProfileDto extends PickType(CertificateProfile, [
   'authorImage',
   'authorDocuments',
   'authorCountryCode',
+  'domain',
+  'additionalInfo',
   'grantLevel'
 ]) { }

@@ -14,5 +14,7 @@ export type CertificateProfileHash = {
   authorEmail: string;
   authorImage: string;
   authorCountryCode: string;
+  domain?: string;
+  additionalInfo?: string;
   grantLevel: number;
 };

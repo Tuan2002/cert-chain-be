@@ -91,6 +91,31 @@ export class CertificateProfile extends AbstractEntity {
   authorCountryCode: string;
 
   @ApiProperty({
+    description: 'The domain associated with the certificate',
+    example: 'Computer Science',
+  })
+  @IsNotEmpty()
+  @IsString()
+  @Expose()
+  @Column({
+    nullable: true,
+  })
+  domain?: string
+
+  @ApiProperty({
+    description: 'Additional information about the certificate',
+    example: 'This certificate is awarded for outstanding performance in the field of computer science.',
+  })
+  @IsOptional()
+  @IsString()
+  @Expose()
+  @Column({
+    type: 'text',
+    nullable: true,
+  })
+  additionalInfo?: string;
+
+  @ApiProperty({
     description: 'The level of the certificate granted to the author',
     example: 3,
   })
