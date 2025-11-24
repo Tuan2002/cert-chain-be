@@ -18,4 +18,5 @@ export enum CertificateRequestErrorCode {
   HAVE_PENDING_CERTIFICATE_REQUEST = 'have_pending_certificate_request',
   INVALID_CERTIFICATE_REQUEST_STATUS = 'invalid_certificate_request_status',
   CERTIFICATE_REQUEST_ALREADY_EXISTS = 'certificate_request_already_exists',
+  INVALID_REQUEST_TYPE = 'invalid_request_type'
 }

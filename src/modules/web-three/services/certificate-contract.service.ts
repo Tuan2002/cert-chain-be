@@ -43,12 +43,40 @@ export class CertificateContractService extends BaseContractService {
 
   ) {
     this.logger.log(`Certificate signed - ID: ${certificateId}, Type ID: ${certificateTypeId}`);
-    await this.certificateEventQueueService.addCertificateSignedEvent({
+    return this.certificateEventQueueService.addCertificateSignedEvent({
       certificateId,
       organizationId,
       certificateTypeId,
       subnmitterAddress: submitterAddress,
       authorIdCard: autholderIdCard,
+      transactionHash: _event.log.transactionHash,
+    });
+  }
+
+  @OnContractEvent(CertificateContractEvent.CertificateApproved)
+  async handleCertificateApproved(
+    certificateId: string,
+    _event: ContractEventPayload
+  ) {
+    this.logger.log(`Certificate approved - ID: ${certificateId}`);
+    return this.certificateEventQueueService.addCertificateApprovedEvent({
+      certificateId,
+      transactionHash: _event.log.transactionHash,
+    });
+  }
+
+  @OnContractEvent(CertificateContractEvent.CertificateRevoked)
+  async handleCertificateRevoked(
+    certificateId: string,
+    revokedBy: string,
+    reason: string,
+    _event: ContractEventPayload
+  ) {
+    this.logger.log(`Certificate revoked - ID: ${certificateId}`);
+    return this.certificateEventQueueService.addCertificateRevokedEvent({
+      certificateId,
+      revokedBy,
+      reason,
       transactionHash: _event.log.transactionHash,
     });
   }
@@ -71,5 +99,25 @@ export class CertificateContractService extends BaseContractService {
       },
     );
 
+  }
+
+  async revokeCertificateAsync(certificateId: string, reason: string): Promise<void> {
+    const signedWallet = await this.createWallet(
+      ContractConfigKey.OWNER_WALLET_KEY,
+    );
+    const signedContract = await this.createSignedContract(
+      CERTIFICATE_CONTRACT_ABI,
+      signedWallet,
+    );
+
+    return this.executeContractMethod(
+      signedContract.revokeCertificate(
+        certificateId,
+        reason
+      ),
+      {
+        errorMessage: 'Failed to revoke certificate on-chain',
+      },
+    );
   }
 }

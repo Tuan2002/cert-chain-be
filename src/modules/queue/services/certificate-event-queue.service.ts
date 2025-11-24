@@ -3,7 +3,7 @@ import { Injectable, Logger } from "@nestjs/common";
 import { Queue } from "bullmq";
 import { DEFAULT_JOB_OPTIONS } from "../configs";
 import { CertificateEventJobs, CertificateJobPrefix, QueueNames } from "../enums";
-import { CertificateApprovedEventJob, CertificateSignedEventJob } from "../interfaces";
+import { CertificateApprovedEventJob, CertificateRevokedEventJob, CertificateSignedEventJob } from "../interfaces";
 
 @Injectable()
 export class CertificateEventQueueService {
@@ -42,5 +42,19 @@ export class CertificateEventQueueService {
       jobId,
     });
     this.logger.log(`Certificate approved job for: ${eventData.certificateId}`);
+  }
+
+  async addCertificateRevokedEvent(eventData: CertificateRevokedEventJob): Promise<void> {
+    const jobId = `${CertificateJobPrefix.CERTIFICATE_REVOKED}-${eventData.transactionHash}`;
+    const existingJob = await this.certificateEventQueue.getJob(jobId);
+    if (existingJob) {
+      this.logger.warn(`Certificate revoked job ${jobId} already exists. Skipped`);
+      return;
+    }
+    await this.certificateEventQueue.add(CertificateEventJobs.CERTIFICATE_REVOKED, eventData, {
+      ...DEFAULT_JOB_OPTIONS,
+      jobId,
+    });
+    this.logger.log(`Certificate revoked job for: ${eventData.certificateId}`);
   }
 }

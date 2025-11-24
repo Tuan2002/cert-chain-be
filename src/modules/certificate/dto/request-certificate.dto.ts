@@ -3,5 +3,10 @@ import { CertificateRequest } from "../entities";
 
 export class RequestCertificateDto extends PickType(CertificateRequest, [
   'requestType',
-  'certificateId'
+  'certificateId',
+  'revokeReason',
+]) { }
+
+export class RejectCertificateRequestDto extends PickType(CertificateRequest, [
+  'rejectionReason',
 ]) { }

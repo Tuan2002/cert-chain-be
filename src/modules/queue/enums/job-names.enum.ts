@@ -17,4 +17,5 @@ export enum CertificateTypeEventJobs {
 export enum CertificateEventJobs {
   CERTIFICATE_SIGNED = 'certificate-signed',
   CERTIFICATE_APPROVED = 'certificate-approved',
+  CERTIFICATE_REVOKED = 'certificate-revoked',
 }

@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import { DataSource, Repository } from "typeorm";
 import { Certificate } from "../entities";
 import { CertificateStatus } from "../enums";
-import { CertificateApprovedEvent, CertificateSignedEvent } from "../types";
+import { CertificateApprovedEvent, CertificateRevokedEvent, CertificateSignedEvent } from "../types";
 
 @Injectable()
 export class CertificateTrackerService {
@@ -61,6 +61,31 @@ export class CertificateTrackerService {
     }, {
       status: CertificateStatus.VERIFIED,
       approvedTxHash: transactionHash
+    });
+  }
+
+  async handleCertificateRevokedEvent(eventData: CertificateRevokedEvent): Promise<void> {
+    const {
+      certificateId,
+      transactionHash
+    } = eventData;
+
+    const existingCert = await this.certificateRepository.findOneOrFail({
+      where: {
+        code: certificateId,
+      }
+    });
+
+    if (existingCert.status === CertificateStatus.REVOKED) {
+      return;
+    }
+
+    await this.certificateRepository.update({
+      id: existingCert.id
+    }, {
+      status: CertificateStatus.REVOKED,
+      revokedAt: dayjs().toDate(),
+      revokedTxHash: transactionHash
     });
   }
 }

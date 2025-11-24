@@ -11,4 +11,5 @@ export enum CertificateTypeJobPrefix {
 export enum CertificateJobPrefix {
   CERTIFICATE_SIGNED = "CERT_SIGNED",
   CERTIFICATE_APPROVED = "CERT_APPROVED",
+  CERTIFICATE_REVOKED = "CERT_REVOKED",
 }

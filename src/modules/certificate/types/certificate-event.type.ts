@@ -11,3 +11,10 @@ export type CertificateApprovedEvent = {
   certificateId: string;
   transactionHash: string;
 }
+
+export type CertificateRevokedEvent = {
+  certificateId: string;
+  revokedBy: string;
+  reason: string;
+  transactionHash: string;
+}

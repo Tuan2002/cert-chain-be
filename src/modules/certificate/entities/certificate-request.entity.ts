@@ -3,7 +3,7 @@ import { Tables } from "@/enums/tables.enum";
 import { Organization } from "@/modules/organization/entities";
 import { ApiProperty } from "@nestjs/swagger";
 import { Expose } from "class-transformer";
-import { IsEnum, IsNotEmpty, IsString } from "class-validator";
+import { IsEnum, IsNotEmpty, IsString, ValidateIf } from "class-validator";
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import { RequestStatus, RequestType } from "../enums";
 import { Certificate } from "./certificate.entity";
@@ -35,6 +35,18 @@ export class CertificateRequest extends AbstractEntity {
     default: RequestStatus.PENDING
   })
   status: RequestStatus;
+
+  @ApiProperty({
+    description: 'The reason for revoking the certificate request',
+    example: 'User requested cancellation',
+  })
+  @Expose()
+  @ValidateIf(o => o.requestType === RequestType.REVOKE)
+  @IsString()
+  @Column({
+    nullable: true
+  })
+  revokeReason?: string;
 
   @ApiProperty({
     description: 'The time when the certificate request was made',

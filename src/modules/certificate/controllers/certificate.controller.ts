@@ -4,8 +4,21 @@ import { AuthorizedContext } from '@/modules/auth/types';
 import { UserRoles } from '@/modules/user/enums';
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { BaseCertificateDto, CertificateDto, CertificateRequestDto, CertificateTypeDto, CreateCertificateDto, CreateCertificateTypeDto, RequestCertificateDto } from '../dto';
-import { CertificateRequestService, CertificateService, CertificateTypeService } from '../services';
+import {
+  BaseCertificateDto,
+  CertificateDto,
+  CertificateRequestDto,
+  CertificateTypeDto,
+  CreateCertificateDto,
+  CreateCertificateTypeDto,
+  RejectCertificateRequestDto,
+  RequestCertificateDto
+} from '../dto';
+import {
+  CertificateRequestService,
+  CertificateService,
+  CertificateTypeService
+} from '../services';
 
 @ApiTags('Certificates')
 @Controller('certificates')
@@ -185,5 +198,15 @@ export class CertificateController {
     @Param('id') certificateRequestId: string
   ) {
     return this.certificateRequestService.approveCertificateRequest(certificateRequestId);
+  }
+
+  @ApiOperation({ summary: 'Reject certificate request' })
+  @Put('certificate-requests/:id/reject')
+  @RBAC(UserRoles.ADMIN)
+  async rejectCertificateRequest(
+    @Param('id') certificateRequestId: string,
+    @Body() rejectCertificateRequestDto: RejectCertificateRequestDto
+  ) {
+    return this.certificateRequestService.rejectCertificateRequest(certificateRequestId, rejectCertificateRequestDto);
   }
 }

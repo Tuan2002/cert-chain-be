@@ -8,9 +8,9 @@ import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
 import { plainToInstance } from "class-transformer";
 import { DataSource, EntityManager, Repository } from "typeorm";
 import { CertificateRequestErrorCode } from "../constants";
-import { CertificateRequestDto, RequestCertificateDto } from "../dto";
+import { CertificateRequestDto, RejectCertificateRequestDto, RequestCertificateDto } from "../dto";
 import { Certificate, CertificateRequest } from "../entities";
-import { RequestStatus } from "../enums";
+import { RequestStatus, RequestType } from "../enums";
 
 @Injectable()
 export class CertificateRequestService {
@@ -130,9 +130,48 @@ export class CertificateRequestService {
       await manager.update(CertificateRequest, { id }, {
         status: RequestStatus.PROCESSED
       });
-      await this.certificateContractService.approveCertificateRequestAsync(
-        certificateRequest.certificateId
-      );
+
+      switch (certificateRequest.requestType) {
+        case RequestType.SIGNUP:
+          await this.certificateContractService.approveCertificateRequestAsync(
+            certificateRequest.certificateId
+          );
+          break;
+        case RequestType.REVOKE:
+          await this.certificateContractService.revokeCertificateAsync(
+            certificateRequest.certificateId,
+            certificateRequest?.revokeReason || 'This certificate has been revoked by organization'
+          );
+          break;
+        default:
+          throw new BadRequestException({
+            message: 'Invalid request type',
+            code: CertificateRequestErrorCode.INVALID_REQUEST_TYPE
+          });
+      }
+    });
+
+    return { id };
+  }
+
+  async rejectCertificateRequest(id: string, rejectRequestDto: RejectCertificateRequestDto): Promise<{ id: string }> {
+    const certificateRequest = await this.certificateRequestRepository.findOne({
+      where: {
+        id,
+        status: RequestStatus.PENDING
+      },
+    });
+
+    if (!certificateRequest) {
+      throw new BadRequestException({
+        message: 'Certificate request not found or is not pending',
+        code: CertificateRequestErrorCode.CERTIFICATE_REQUEST_NOT_FOUND
+      });
+    }
+
+    await this.certificateRequestRepository.update({ id }, {
+      status: RequestStatus.PROCESSED,
+      rejectionReason: rejectRequestDto?.rejectionReason || 'This certificate request has been rejected by admin'
     });
 
     return { id };

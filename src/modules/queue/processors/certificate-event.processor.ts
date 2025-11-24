@@ -3,7 +3,7 @@ import { Processor, WorkerHost } from "@nestjs/bullmq";
 import { Logger } from "@nestjs/common";
 import { Job } from "bullmq";
 import { CertificateEventJobs, QueueNames } from "../enums";
-import { CertificateApprovedEventJob, CertificateSignedEventJob } from "../interfaces";
+import { CertificateApprovedEventJob, CertificateRevokedEventJob, CertificateSignedEventJob } from "../interfaces";
 
 @Processor(QueueNames.CERTIFICATE_EVENTS)
 export class CertificateEventProcessor extends WorkerHost {
@@ -61,5 +61,24 @@ export class CertificateEventProcessor extends WorkerHost {
     });
 
     this.logger.log(`Processed certificate approved event for ID: ${certificateId}`);
+  }
+
+  async handleCertificateRevokedJob(eventData: CertificateRevokedEventJob): Promise<void> {
+    const {
+      certificateId,
+      revokedBy,
+      reason,
+      transactionHash
+    } = eventData;
+    this.logger.log(`Processing certificate revoked event for ID: ${certificateId}`);
+
+    await this.certificateTrackerService.handleCertificateRevokedEvent({
+      certificateId,
+      revokedBy,
+      reason,
+      transactionHash
+    });
+
+    this.logger.log(`Processed certificate revoked event for ID: ${certificateId}`);
   }
 }
