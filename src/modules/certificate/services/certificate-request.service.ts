@@ -73,8 +73,7 @@ export class CertificateRequestService {
           ),
           ...parseFilterQuery<CertificateRequest>(filters)
         },
-        order: sort ? parseSortQuery<Certificate>(sort) : { createdAt: 'DESC' },
-        relations: ['certificateType', 'certificateProfile']
+        order: sort ? parseSortQuery<CertificateRequest>(sort) : { createdAt: 'DESC' },
       });
 
     const resPagination = getPagination({
