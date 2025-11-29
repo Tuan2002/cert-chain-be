@@ -91,7 +91,10 @@ export class CertificateRequestService {
     const certificateRequests = rawCertificateRequests.map((certificateRequest) =>
       plainToInstance(CertificateRequestDto, {
         ...certificateRequest,
-        certificate: certificateRequest.certificate,
+        certificate: {
+          ...certificateRequest.certificate,
+          authorProfile: certificateRequest?.certificate?.certificateProfile
+        },
         organization: certificateRequest.organization
       }, {
         excludeExtraneousValues: true,
@@ -125,7 +128,10 @@ export class CertificateRequestService {
 
     return plainToInstance(CertificateRequestDto, {
       ...certificateRequest,
-      certificate: certificateRequest.certificate,
+      certificate: {
+        ...certificateRequest.certificate,
+        authorProfile: certificateRequest?.certificate?.certificateProfile
+      },
       organization: certificateRequest.organization
     }, {
       excludeExtraneousValues: true
