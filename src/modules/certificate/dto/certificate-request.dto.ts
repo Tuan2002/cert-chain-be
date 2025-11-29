@@ -2,7 +2,7 @@ import { OrganizationDto } from "@/modules/organization/dto";
 import { ApiProperty, PickType } from "@nestjs/swagger";
 import { Expose, Type } from "class-transformer";
 import { CertificateRequest } from "../entities";
-import { BaseCertificateDto } from "./certificate.dto";
+import { CertificateDto } from "./certificate.dto";
 
 export class CertificateRequestDto extends PickType(CertificateRequest, [
   'id',
@@ -17,11 +17,11 @@ export class CertificateRequestDto extends PickType(CertificateRequest, [
 ]) {
   @ApiProperty({
     description: 'Details of the certificate request',
-    type: BaseCertificateDto,
+    type: CertificateDto,
   })
-  @Type(() => BaseCertificateDto)
+  @Type(() => CertificateDto)
   @Expose()
-  certificate?: BaseCertificateDto;
+  certificate?: CertificateDto;
 
   @ApiProperty({
     description: 'Details of the organization making the request',
