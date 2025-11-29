@@ -74,7 +74,13 @@ export class CertificateRequestService {
           ...parseFilterQuery<CertificateRequest>(filters)
         },
         order: sort ? parseSortQuery<CertificateRequest>(sort) : { createdAt: 'DESC' },
-        relations: ['organization', 'certificate']
+        relations: {
+          organization: true,
+          certificate: {
+            certificateType: true,
+            certificateProfile: true
+          }
+        }
       });
 
     const resPagination = getPagination({
@@ -101,7 +107,13 @@ export class CertificateRequestService {
   async getCertificateRequestById(id: string): Promise<CertificateRequestDto> {
     const certificateRequest = await this.certificateRequestRepository.findOne({
       where: { id },
-      relations: ['organization', 'certificate']
+      relations: {
+        organization: true,
+        certificate: {
+          certificateType: true,
+          certificateProfile: true
+        }
+      }
     });
 
     if (!certificateRequest) {
