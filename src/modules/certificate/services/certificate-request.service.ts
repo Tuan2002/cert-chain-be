@@ -74,6 +74,7 @@ export class CertificateRequestService {
           ...parseFilterQuery<CertificateRequest>(filters)
         },
         order: sort ? parseSortQuery<CertificateRequest>(sort) : { createdAt: 'DESC' },
+        relations: ['organization', 'certificate']
       });
 
     const resPagination = getPagination({
@@ -82,7 +83,11 @@ export class CertificateRequestService {
     });
 
     const certificateRequests = rawCertificateRequests.map((certificateRequest) =>
-      plainToInstance(CertificateRequestDto, certificateRequest, {
+      plainToInstance(CertificateRequestDto, {
+        ...certificateRequest,
+        certificate: certificateRequest.certificate,
+        organization: certificateRequest.organization
+      }, {
         excludeExtraneousValues: true,
       }),
     );
@@ -105,7 +110,11 @@ export class CertificateRequestService {
       });
     }
 
-    return plainToInstance(CertificateRequestDto, certificateRequest, {
+    return plainToInstance(CertificateRequestDto, {
+      ...certificateRequest,
+      certificate: certificateRequest.certificate,
+      organization: certificateRequest.organization
+    }, {
       excludeExtraneousValues: true
     });
   }
