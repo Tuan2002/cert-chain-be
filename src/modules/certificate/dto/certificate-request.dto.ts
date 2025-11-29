@@ -21,7 +21,7 @@ export class CertificateRequestDto extends PickType(CertificateRequest, [
   })
   @Type(() => BaseCertificateDto)
   @Expose()
-  certificate: BaseCertificateDto;
+  certificate?: BaseCertificateDto;
 
   @ApiProperty({
     description: 'Details of the organization making the request',
@@ -29,5 +29,5 @@ export class CertificateRequestDto extends PickType(CertificateRequest, [
   })
   @Type(() => OrganizationDto)
   @Expose()
-  organization: OrganizationDto;
+  organization?: OrganizationDto;
 }

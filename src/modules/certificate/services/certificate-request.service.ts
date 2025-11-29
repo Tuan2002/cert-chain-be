@@ -101,6 +101,7 @@ export class CertificateRequestService {
   async getCertificateRequestById(id: string): Promise<CertificateRequestDto> {
     const certificateRequest = await this.certificateRequestRepository.findOne({
       where: { id },
+      relations: ['organization', 'certificate']
     });
 
     if (!certificateRequest) {
