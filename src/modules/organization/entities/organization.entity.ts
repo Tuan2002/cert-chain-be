@@ -1,7 +1,6 @@
 import { AbstractEntity } from "@/base/entities/base.entity";
 import { Tables } from "@/enums/tables.enum";
 import { Certificate } from "@/modules/certificate/entities";
-import { CertificateRequest } from "@/modules/certificate/entities/certificate-request.entity";
 import { ApiProperty } from "@nestjs/swagger";
 import { Expose } from "class-transformer";
 import { IsNotEmpty, IsOptional, IsString } from "class-validator";
@@ -95,7 +94,4 @@ export class Organization extends AbstractEntity {
 
   @OneToMany(() => Certificate, (certificate) => certificate.organization)
   certificates: Certificate[];
-
-  @OneToMany(() => CertificateRequest, (certificateRequest) => certificateRequest.organization)
-  certificateRequests: CertificateRequest[];
 }

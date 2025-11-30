@@ -60,7 +60,7 @@ export class CertificateProfile extends AbstractEntity {
   @Column({
     nullable: true
   })
-  authorImage: string;
+  authorImage?: string;
 
   @ApiProperty({
     description: 'The documents of the author of the certificate',

@@ -7,11 +7,9 @@ import { CertificateController } from "./controllers";
 import {
   Certificate,
   CertificateProfile,
-  CertificateRequest,
   CertificateType
 } from "./entities";
 import {
-  CertificateRequestService,
   CertificateService,
   CertificateTrackerService,
   CertificateTypeService,
@@ -24,7 +22,6 @@ import {
       CertificateType,
       Certificate,
       CertificateProfile,
-      CertificateRequest,
       User
     ]),
     forwardRef(() => WebThreeModule),
@@ -37,8 +34,7 @@ import {
     CertificateService,
     CertificateTypeService,
     CertificateTypeTrackerService,
-    CertificateTrackerService,
-    CertificateRequestService
+    CertificateTrackerService
   ],
   exports: [
     CertificateTypeTrackerService,

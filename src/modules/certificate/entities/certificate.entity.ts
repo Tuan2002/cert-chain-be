@@ -5,10 +5,9 @@ import { User } from "@/modules/user/entities";
 import { ApiProperty } from "@nestjs/swagger";
 import { Expose } from "class-transformer";
 import { IsDateString, IsEnum, IsNotEmpty, IsString } from "class-validator";
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from "typeorm";
 import { CertificateStatus } from "../enums/certificate-status.enum";
 import { CertificateProfile } from "./certificate-profile.entity";
-import { CertificateRequest } from "./certificate-request.entity";
 import { CertificateType } from "./certificate-type.entity";
 
 @Entity(Tables.Certificate)
@@ -177,9 +176,6 @@ export class Certificate extends AbstractEntity {
   @ManyToOne(() => CertificateType, (certificateType) => certificateType.certificates)
   @JoinColumn({ name: 'certificate_type_id' })
   certificateType: CertificateType;
-
-  @OneToMany(() => CertificateRequest, (certificateRequest) => certificateRequest.certificate)
-  certificateRequests: CertificateRequest[];
 
   @ManyToOne(() => User, (user) => user.issuedCertificates)
   @JoinColumn({ name: 'issuer_id' })

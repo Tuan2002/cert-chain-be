@@ -8,7 +8,7 @@ import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
 import { plainToInstance } from "class-transformer";
 import { DataSource, EntityManager, ILike, Repository } from "typeorm";
 import { CertificateErrorCode } from "../constants";
-import { BaseCertificateDto, CertificateDto, CreateCertificateDto } from "../dto";
+import { BaseCertificateDto, CertificateDto, CreateCertificateDto, MultiCertificateCreateDto } from "../dto";
 import { Certificate, CertificateProfile, CertificateType } from "../entities";
 import { CertificateHashType } from "../types";
 import { generateCertBuffer, generateCertCode } from "../utils";
@@ -82,6 +82,66 @@ export class CertificateService {
     return plainToInstance(CertificateDto, certificate, {
       excludeExtraneousValues: true
     })
+  }
+
+  async createMultipleCertificatesAsync(issuerId: string, certificatesData: MultiCertificateCreateDto) {
+    const {
+      organizationId,
+      certificateTypeId,
+    } = certificatesData;
+    const [organization, certificateType] = await Promise.all([
+      this.dataSource.getRepository(Organization).findOneBy({ id: organizationId }),
+      this.dataSource.getRepository(CertificateType).findOneBy({ id: certificateTypeId })
+    ]);
+
+    if (!organization || !certificateType) {
+      throw new BadRequestException({
+        message: 'Invalid organization or certificate type',
+        code: CertificateErrorCode.INVALID_ARGUMENTS
+      })
+    }
+
+    const certificates = await this.dataSource.transaction(async (manager: EntityManager) => {
+      const createdCertificateIDs: string[] = [];
+      for (const certData of certificatesData.certificates) {
+        const { authorProfile, validFrom, validTo } = certData;
+        const { authorDocuments, ...authorProfileData } = authorProfile;
+
+        const certificateCode = generateCertCode();
+        const newCertificateProfile = await manager.save(CertificateProfile, {
+          ...authorProfile
+        });
+
+        const certificateHashData: CertificateHashType = {
+          certificateCode: certificateCode,
+          organizationName: organization?.name,
+          certificateType: certificateType?.name,
+          authorProfile: {
+            ...authorProfileData
+          },
+          validFrom: validFrom,
+          validTo: validTo
+        };
+
+        const bufferData = await generateCertBuffer(certificateHashData);
+        const { hash } = await this.ipfsService.uploadDataAsync(bufferData);
+
+        const newCertificate = await manager.save(Certificate, {
+          issuerId: issuerId,
+          organizationId: organizationId,
+          certificateTypeId: certificateTypeId,
+          certificateProfileId: newCertificateProfile.id,
+          certificateHash: hash,
+          code: certificateCode,
+          validFrom: validFrom,
+          validTo: validTo
+        });
+        createdCertificateIDs.push(newCertificate.id);
+      }
+      return createdCertificateIDs;
+    })
+
+    return certificates;
   }
 
   async getCertificatesAsync(queryOptionsDto: QueryOptionsDto, organizationId?: string) {

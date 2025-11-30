@@ -12,7 +12,7 @@ export type CertificateProfileHash = {
   authorIdCard: string;
   authorDob: Date;
   authorEmail: string;
-  authorImage: string;
+  authorImage?: string;
   authorCountryCode: string;
   domain?: string;
   additionalInfo?: string;

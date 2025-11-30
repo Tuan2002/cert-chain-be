@@ -4,8 +4,16 @@ import { QueueModule } from "../queue/queue.module";
 import { User } from "../user/entities";
 import { WebThreeModule } from "../web-three/web-three.module";
 import { OrganizationController } from "./controllers";
-import { Organization, OrganizationMember, OrganizationRegistration } from "./entities";
-import { OrganizationRegistrationService, OrganizationService, OrganizationTrackerService } from "./services";
+import {
+  Organization,
+  OrganizationMember,
+  OrganizationRegistration
+} from "./entities";
+import {
+  OrganizationRegistrationService,
+  OrganizationService,
+  OrganizationTrackerService
+} from "./services";
 
 @Module({
   imports: [

@@ -44,6 +44,18 @@ export class CertificateType extends AbstractEntity {
   description?: string;
 
   @ApiProperty({
+    description: 'Additional information about the organization',
+    example: 'Founded in 2010, VCSoft has been promoting open-source software development in Vietnam.',
+  })
+  @IsOptional()
+  @IsString()
+  @Expose()
+  @Column({
+    nullable: true
+  })
+  additionalInfo?: string;
+
+  @ApiProperty({
     description: 'Indicates if the certificate type is currently active',
     example: true,
   })
