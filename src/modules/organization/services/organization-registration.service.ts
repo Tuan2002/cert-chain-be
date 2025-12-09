@@ -142,9 +142,10 @@ export class OrganizationRegistrationService {
     await this.dataSource.transaction(async (manager: EntityManager) => {
       const newOrganization = manager.create(Organization, {
         name: registration.organizationName,
-        description: registration.organizationDescription,
+        description: registration?.organizationDescription,
         countryCode: registration.countryCode,
-        website: registration.website,
+        website: registration?.website,
+        additionalInfo: registration?.additionalInfo,
       });
 
       const createdOrganization = await manager.save(Organization, newOrganization);

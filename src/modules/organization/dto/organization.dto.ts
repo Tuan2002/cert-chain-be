@@ -7,6 +7,7 @@ export class OrganizationDto extends PickType(Organization, [
   "id",
   "name",
   'description',
+  'additionalInfo',
   "website",
   "countryCode",
   "isActive",

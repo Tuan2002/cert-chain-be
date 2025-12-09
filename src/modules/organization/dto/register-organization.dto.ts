@@ -8,7 +8,8 @@ export class RegisterOrganizationDto extends PickType(OrganizationRegistration, 
   'email',
   'organizationName',
   'organizationDescription',
+  'additionalInfo',
   'countryCode',
   'phoneNumber',
   'website'
-]) {}
+]) { }

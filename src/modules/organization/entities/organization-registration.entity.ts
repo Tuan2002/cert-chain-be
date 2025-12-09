@@ -81,6 +81,19 @@ export class OrganizationRegistration extends AbstractEntity {
   organizationDescription?: string;
 
   @ApiProperty({
+    description: 'Additional information about the organization',
+    example: 'Founded in 2010, VCSoft has been promoting open-source projects.',
+  })
+  @IsOptional()
+  @IsString()
+  @Expose()
+  @Column({
+    type: 'text',
+    nullable: true
+  })
+  additionalInfo?: string;
+
+  @ApiProperty({
     description: 'Website URL of the organization',
     example: 'https://vcsoft.com',
   })

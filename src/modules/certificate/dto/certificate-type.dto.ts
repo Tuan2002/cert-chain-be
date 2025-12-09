@@ -6,6 +6,7 @@ export class CertificateTypeDto extends PickType(CertificateType, [
   'code',
   'name',
   'description',
+  "additionalInfo",
   'isActive',
   'initTxHash',
   'lastChangedTxHash',

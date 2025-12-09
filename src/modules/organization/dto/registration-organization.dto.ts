@@ -10,6 +10,7 @@ export class RegistrationOrganizationDto extends PickType(OrganizationRegistrati
   'phoneNumber',
   'organizationName',
   'organizationDescription',
+  'additionalInfo',
   'countryCode',
   'website',
   'status',

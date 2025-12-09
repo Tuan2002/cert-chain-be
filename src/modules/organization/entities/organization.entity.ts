@@ -32,6 +32,19 @@ export class Organization extends AbstractEntity {
   description?: string;
 
   @ApiProperty({
+    description: 'Additional information about the organization',
+    example: 'Founded in 2010, VCSoft has been promoting open-source projects.',
+  })
+  @IsOptional()
+  @IsString()
+  @Expose()
+  @Column({
+    type: 'text',
+    nullable: true
+  })
+  additionalInfo?: string;
+
+  @ApiProperty({
     description: 'The country code of the organization',
     example: 'VN',
   })

@@ -4,5 +4,6 @@ import { CertificateType } from "../entities";
 export class CreateCertificateTypeDto extends PickType(CertificateType, [
   'code',
   'name',
-  'description'
+  'description',
+  'additionalInfo'
 ]) { }
