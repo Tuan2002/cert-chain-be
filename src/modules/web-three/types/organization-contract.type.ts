@@ -4,3 +4,8 @@ export type CreateOrganizationType = {
   name: string;
   countryCode: string;
 };
+
+export type AddManagerType = {
+  orgId: string;
+  walletAddress: string;
+};

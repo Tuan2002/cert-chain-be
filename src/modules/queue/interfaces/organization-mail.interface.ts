@@ -20,3 +20,12 @@ export interface SendOrgRejectedJob {
   rejectedAt: Date;
   reason: string;
 }
+
+export interface SendManagerAddedJob {
+  to: string;
+  organizationName: string;
+  managerName: string;
+  addedAt: Date;
+  account: string;
+  password: string;
+}

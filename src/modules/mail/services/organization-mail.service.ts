@@ -1,6 +1,6 @@
-import { OrganizationApprovedEmail, OrganizationRegisteredEmail, OrganizationRejectedEmail } from "@/templates/organization";
+import { ManagerAddedEmail, OrganizationApprovedEmail, OrganizationRegisteredEmail, OrganizationRejectedEmail } from "@/templates/organization";
 import { Injectable, Logger } from "@nestjs/common";
-import { SendOrgApprovedMailDto, SendOrgRegisteredMailDto, SendOrgRejectedMailDto } from "../dto";
+import { SendManagerAddedMailDto, SendOrgApprovedMailDto, SendOrgRegisteredMailDto, SendOrgRejectedMailDto } from "../dto";
 import { MailService } from "./mail.service";
 
 @Injectable()
@@ -8,7 +8,7 @@ export class OrganizationMailService {
   private readonly logger = new Logger(OrganizationMailService.name);
   constructor(
     private readonly mailService: MailService,
-  ) {}
+  ) { }
 
   /**   
    * Send organization registered email
@@ -39,13 +39,13 @@ export class OrganizationMailService {
    * @returns A promise that resolves when the email is sent
    */
   async sendOrganizationApprovedAsync(sendApprovedMailDto: SendOrgApprovedMailDto): Promise<void> {
-    const { 
-      to, 
-      organizationName, 
-      ownerName, 
-      account, 
-      password, 
-      approvedAt 
+    const {
+      to,
+      organizationName,
+      ownerName,
+      account,
+      password,
+      approvedAt
     } = sendApprovedMailDto;
     const subject = 'CertChain - Organization Approved';
     const body = OrganizationApprovedEmail({
@@ -55,7 +55,7 @@ export class OrganizationMailService {
       password,
       approvedAt,
     });
-    
+
     return this.mailService.sendReactMail({
       to,
       subject,
@@ -92,6 +92,37 @@ export class OrganizationMailService {
       body,
     }).catch((error) => {
       throw new Error(`Error sending organization rejected email: ${error.message}`);
+    });
+  }
+
+  /**   
+   * Send manager added email
+   * @param sendManagerAddedMailDto Data transfer object containing email details
+   * @returns A promise that resolves when the email is sent
+   */
+  async sendManagerAddedAsync(sendManagerAddedMailDto: SendManagerAddedMailDto): Promise<void> {
+    const {
+      to,
+      organizationName,
+      managerName,
+      addedAt,
+      account,
+      password,
+    } = sendManagerAddedMailDto;
+    const subject = 'CertChain - Manager Access Granted';
+    const body = ManagerAddedEmail({
+      organizationName,
+      managerName,
+      addedAt,
+      account,
+      password,
+    });
+    return this.mailService.sendReactMail({
+      to,
+      subject,
+      body,
+    }).catch((error) => {
+      throw new Error(`Error sending manager added email: ${error.message}`);
     });
   }
 }

@@ -11,7 +11,7 @@ import {
 } from '../enums';
 import { OrganizationContractEvent } from '../enums/organization-contract-event.enum';
 import { ContractEventLoader } from '../providers';
-import { CreateOrganizationType } from '../types';
+import { AddManagerType, CreateOrganizationType } from '../types';
 import { BaseContractService } from './base-contract.service';
 
 @Injectable()
@@ -80,6 +80,32 @@ export class OrganizationContractService extends BaseContractService {
       ),
       {
         errorMessage: 'Failed to create organization on blockchain',
+      },
+    );
+  }
+
+  /**
+   * Add manager to organization on blockchain
+   * @param addManagerData 
+   * @throws Error when transaction fails
+   */
+  async addManagerAsync(addManagerData: AddManagerType): Promise<void> {
+    const { orgId, walletAddress } = addManagerData;
+    const signedWallet = await this.createWallet(
+      ContractConfigKey.OWNER_WALLET_KEY,
+    );
+    const signedContract = await this.createSignedContract(
+      ORGANIZATION_CONTRACT_ABI,
+      signedWallet,
+    );
+
+    return this.executeContractMethod(
+      signedContract.addManager(
+        orgId,
+        walletAddress,
+      ),
+      {
+        errorMessage: 'Failed to add manager on blockchain',
       },
     );
   }

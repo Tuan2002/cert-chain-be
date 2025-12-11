@@ -3,7 +3,7 @@ import { Processor, WorkerHost } from "@nestjs/bullmq";
 import { Logger } from "@nestjs/common";
 import { Job } from "bullmq";
 import { OrganizationMailJobs, QueueNames } from "../enums";
-import { SendOrgApprovedJob, SendOrgRegisteredJob, SendOrgRejectedJob } from "../interfaces";
+import { SendManagerAddedJob, SendOrgApprovedJob, SendOrgRegisteredJob, SendOrgRejectedJob } from "../interfaces";
 
 @Processor(QueueNames.ORGANIZATION_MAILS)
 export class OrganizationMailProcessor extends WorkerHost {
@@ -22,9 +22,16 @@ export class OrganizationMailProcessor extends WorkerHost {
 
       case OrganizationMailJobs.SEND_APPROVED_EMAIL:
         return this.handleSendApprovedEmailQueue(job.data);
-        
+
       case OrganizationMailJobs.SEND_REJECTED_EMAIL:
         return this.handleSendRejectedEmailQueue(job.data);
+
+      case OrganizationMailJobs.SEND_MANAGER_ADDED_EMAIL:
+        return this.handleSendManagerAddedEmailQueue(job.data);
+
+      default:
+        this.logger.warn(`No handler for job name: ${job.name}`);
+        return;
     }
   }
 
@@ -67,5 +74,20 @@ export class OrganizationMailProcessor extends WorkerHost {
       reason: data.reason,
     });
     this.logger.log(`Processed email for rejected organization: ${data.to}`);
+  }
+
+  private async handleSendManagerAddedEmailQueue(
+    data: SendManagerAddedJob
+  ): Promise<void> {
+    this.logger.log(`Processing email for added manager: ${data.to}`);
+    await this.organizationMailService.sendManagerAddedAsync({
+      to: data.to,
+      organizationName: data.organizationName,
+      managerName: data.managerName,
+      addedAt: data.addedAt,
+      account: data.account,
+      password: data.password,
+    });
+    this.logger.log(`Processed email for added manager: ${data.to}`);
   }
 }

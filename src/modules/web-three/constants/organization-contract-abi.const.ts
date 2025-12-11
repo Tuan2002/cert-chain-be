@@ -7,5 +7,6 @@ export const ORGANIZATION_CONTRACT_ABI = [
     'event ManagerRemoved(string orgId, address manager)',
 
     // Functions
-    'function createOrganization(string memory _id, address _owner, string memory _name, string memory _countryCode)'
+    'function createOrganization(string memory _id, address _owner, string memory _name, string memory _countryCode)',
+    'function addManager(string memory _orgId, address _manager)'
 ];

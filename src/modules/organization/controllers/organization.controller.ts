@@ -4,7 +4,7 @@ import { AuthorizedContext } from '@/modules/auth/types';
 import { UserRoles } from '@/modules/user/enums';
 import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { RegisterOrganizationDto, RegistrationOrganizationDto, RejectRegistrationDto } from '../dto';
+import { AddOrganizationMemberDto, RegisterOrganizationDto, RegistrationOrganizationDto, RejectRegistrationDto } from '../dto';
 import { OrganizationRegistrationService, OrganizationService } from '../services';
 
 @ApiTags('Organizations')
@@ -103,5 +103,28 @@ export class OrganizationController {
     @Body() rejectRegistrationDto: RejectRegistrationDto
   ) {
     return this.organizationRegistrationService.rejectRegistrationAsync(id, rejectRegistrationDto);
+  }
+
+  @Post('add-member')
+  @RBAC(UserRoles.ORGANIZATION, UserRoles.ADMIN)
+  @ApiOperation({
+    summary: 'Add a new member to an organization',
+  })
+  async addOrganizationMember(
+    @Body() addMemberDto: AddOrganizationMemberDto,
+    @UserRequest() context: AuthorizedContext
+  ) {
+    return this.organizationRegistrationService.addOrganizationMemberAsync(context.userId, addMemberDto);
+  }
+
+  @Get('members/:organizationId')
+  @RBAC(UserRoles.ORGANIZATION, UserRoles.ADMIN)
+  @ApiOperation({
+    summary: 'Get members of an organization',
+  })
+  async getOrganizationMembers(
+    @Param('organizationId') organizationId: string
+  ) {
+    return this.organizationRegistrationService.getOrganizationMembersAsync(organizationId);
   }
 }

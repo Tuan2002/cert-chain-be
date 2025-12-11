@@ -59,3 +59,28 @@ export class SendOrgRejectedMailDto {
   @IsNotEmpty()
   reason: string;
 }
+
+export class SendManagerAddedMailDto {
+  @IsEmail()
+  @IsNotEmpty()
+  to: string;
+
+  @IsString()
+  @IsNotEmpty()
+  managerName: string;
+
+  @IsString()
+  @IsNotEmpty()
+  organizationName: string;
+
+  @IsDateString()
+  addedAt: Date;
+
+  @IsString()
+  @IsNotEmpty()
+  account: string;
+
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+}

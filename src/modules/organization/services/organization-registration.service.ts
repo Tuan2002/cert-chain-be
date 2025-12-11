@@ -15,6 +15,7 @@ import randomstring from "randomstring";
 import { DataSource, EntityManager, ILike, Repository } from "typeorm";
 import { OrganizationErrorCode } from "../constants";
 import {
+  AddOrganizationMemberDto,
   RegisterOrganizationDto,
   RegistrationOrganizationDto,
   RejectRegistrationDto
@@ -31,6 +32,13 @@ export class OrganizationRegistrationService {
   constructor(
     @InjectRepository(OrganizationRegistration)
     private registrationRepository: Repository<OrganizationRegistration>,
+    @InjectRepository(Organization)
+    private organizationRepository: Repository<Organization>,
+    @InjectRepository(OrganizationMember)
+    private organizationMemberRepository: Repository<OrganizationMember>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+
     @InjectDataSource()
     private dataSource: DataSource,
     private readonly organizationMailQueueService: OrganizationMailQueueService,
@@ -239,5 +247,93 @@ export class OrganizationRegistrationService {
         rejectReason: rejectRegistrationDto.rejectReason,
       });
     });
+  }
+
+  async addOrganizationMemberAsync(userId: string, addMemberDto: AddOrganizationMemberDto) {
+    const isOwner = await this.organizationMemberRepository.exists({
+      where: {
+        userId,
+        organizationId: addMemberDto.organizationId,
+        isOwner: true,
+      }
+    });
+    if (!isOwner) {
+      throw new BadRequestException({
+        message: 'Only organization owners can add members.',
+        code: OrganizationErrorCode.UNAUTHORIZED_ACTION
+      });
+    }
+
+    const emailInUse = await this.userRepository.exists({
+      where: {
+        email: addMemberDto.email,
+      }
+    });
+    if (emailInUse) {
+      throw new BadRequestException({
+        message: 'This email is already in use.',
+        code: OrganizationErrorCode.EMAIL_ALREADY_IN_USE
+      });
+    }
+
+    await this.dataSource.transaction(async (manager: EntityManager) => {
+      const organization = await manager.findOneOrFail(Organization, {
+        where: {
+          id: addMemberDto.organizationId,
+        }
+      });
+
+      const randomPassword = randomstring.generate();
+      const hashedPassword = await bcrypt.hash(
+        randomPassword,
+        SecurityOptions.PASSWORD_SALT_ROUNDS,
+      );
+
+      const newUser = manager.create(User, {
+        firstName: addMemberDto?.firstName,
+        lastName: addMemberDto.lastName,
+        email: addMemberDto.email,
+        userName: addMemberDto.email,
+        phoneNumber: addMemberDto?.phone,
+        hashedPassword,
+        role: UserRoles.MANAGER,
+      });
+      const createdUser = await manager.save(User, newUser);
+
+      const newOrganizationMember = manager.create(OrganizationMember, {
+        organizationId: organization.id,
+        userId: createdUser.id,
+        walletAddress: addMemberDto.walletAddress.toLowerCase(),
+        isOwner: true,
+      });
+
+      await manager.save(OrganizationMember, newOrganizationMember);
+
+      await this.organizationContractService.addManagerAsync({
+        orgId: organization.id,
+        walletAddress: addMemberDto.walletAddress,
+      });
+
+      await this.organizationMailQueueService.addSendManagerAddedEmailJob({
+        to: addMemberDto.email,
+        organizationName: organization.name,
+        managerName: `${addMemberDto.firstName} ${addMemberDto.lastName}`,
+        addedAt: dayjs().toDate(),
+        account: addMemberDto.email,
+        password: randomPassword,
+      });
+    });
+  }
+
+  async getOrganizationMembersAsync(organizationId: string) {
+    const members = await this.organizationMemberRepository.find({
+      where: {
+        organizationId,
+      },
+      relations: {
+        user: true,
+      }
+    });
+    return members;
   }
 }
