@@ -4,7 +4,7 @@ import { AuthorizedContext } from '@/modules/auth/types';
 import { UserRoles } from '@/modules/user/enums';
 import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AddOrganizationMemberDto, RegisterOrganizationDto, RegistrationOrganizationDto, RejectRegistrationDto } from '../dto';
+import { AddOrganizationMemberDto, OrganizationDto, RegisterOrganizationDto, RegistrationOrganizationDto, RejectRegistrationDto } from '../dto';
 import { OrganizationRegistrationService, OrganizationService } from '../services';
 
 @ApiTags('Organizations')
@@ -33,12 +33,12 @@ export class OrganizationController {
   @ApiOperation({
     summary: 'Get my organizations with pagination',
   })
-  @ApiResponseType(RegistrationOrganizationDto,
+  @ApiResponseType(OrganizationDto,
     { isArray: true, hasPagination: true }
   )
   @ApiBodyQueryOptions()
   @Post('my-organizations')
-  @RBAC(UserRoles.ORGANIZATION)
+  @RBAC(UserRoles.ORGANIZATION, UserRoles.MANAGER, UserRoles.ADMIN)
   async getMyOrganizations(
     @Body() queryOptionsDto: QueryOptionsDto,
     @UserRequest() context: AuthorizedContext

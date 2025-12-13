@@ -116,7 +116,6 @@ export class CertificateController {
   }
 
   @Post('get-certificates')
-  // @RBAC(UserRoles.ADMIN)
   @ApiOperation({
     summary: 'Get all certificates with pagination',
   })
