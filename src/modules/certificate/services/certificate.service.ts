@@ -211,7 +211,8 @@ export class CertificateService {
 
     return plainToInstance(CertificateDto, {
       ...certificate,
-      authorProfile: certificate.certificateProfile
+      authorProfile: certificate.certificateProfile,
+      issuer: certificate.issuer
     }, {
       excludeExtraneousValues: true
     });
