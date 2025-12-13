@@ -118,7 +118,7 @@ export class OrganizationController {
   }
 
   @Get('members/:organizationId')
-  @RBAC(UserRoles.ORGANIZATION, UserRoles.ADMIN)
+  @RBAC(UserRoles.ORGANIZATION, UserRoles.MANAGER, UserRoles.ADMIN)
   @ApiOperation({
     summary: 'Get members of an organization',
   })
