@@ -22,6 +22,9 @@ export class CertificateEventProcessor extends WorkerHost {
 
       case CertificateEventJobs.CERTIFICATE_APPROVED:
         return this.handleCertificateApprovedJob(job.data);
+
+      case CertificateEventJobs.CERTIFICATE_REVOKED:
+        return this.handleCertificateRevokedJob(job.data);
     }
   }
 
