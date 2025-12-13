@@ -267,7 +267,7 @@ export class CertificateService {
         code: CertificateErrorCode.INVALID_CERTIFICATE_STATUS
       });
     }
-    await this.certificateContractService.approveCertificateAsync(certificateId);
+    await this.certificateContractService.approveCertificateAsync(certificate.code);
     return {
       id: certificateId
     }
@@ -297,7 +297,7 @@ export class CertificateService {
       });
     }
 
-    await this.certificateContractService.revokeCertificateAsync(certificateId, revokeData.revokeReason);
+    await this.certificateContractService.revokeCertificateAsync(certificate.code, revokeData.revokeReason);
     return {
       id: certificateId
     }
