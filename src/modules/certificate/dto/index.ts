@@ -4,4 +4,5 @@ export * from './certificate.dto';
 export * from './create-certificate-type.dto';
 export * from './create-certificate.dto';
 export * from './multi-certificate-create.dto';
+export * from './revoke-certificate.dto';
 export * from './update-certificate-type.dto';

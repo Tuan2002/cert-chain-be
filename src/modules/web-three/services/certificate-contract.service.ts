@@ -81,7 +81,7 @@ export class CertificateContractService extends BaseContractService {
     });
   }
 
-  async approveCertificateRequestAsync(certificateId: string): Promise<void> {
+  async approveCertificateAsync(certificateId: string): Promise<void> {
     const signedWallet = await this.createWallet(
       ContractConfigKey.OWNER_WALLET_KEY,
     );
@@ -95,7 +95,7 @@ export class CertificateContractService extends BaseContractService {
         certificateId
       ),
       {
-        errorMessage: 'Failed to approve certificate request on-chain',
+        errorMessage: 'Failed to approve certificate on-chain',
       },
     );
 

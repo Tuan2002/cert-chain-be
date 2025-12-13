@@ -10,7 +10,8 @@ import {
   CertificateTypeDto,
   CreateCertificateDto,
   CreateCertificateTypeDto,
-  MultiCertificateCreateDto
+  MultiCertificateCreateDto,
+  RevokeCertificateDto
 } from '../dto';
 import {
   CertificateService,
@@ -149,5 +150,26 @@ export class CertificateController {
     @Param('id') id: string
   ) {
     return this.certificateService.getCertificateByIdAsync(id);
+  }
+
+  @ApiOperation({ summary: 'Approve certificate by id' })
+  @Put('approve/:certificateId')
+  @RBAC(UserRoles.ORGANIZATION)
+  async approveCertificateById(
+    @Param('certificateId') certificateId: string,
+    @UserRequest() context: AuthorizedContext
+  ) {
+    return this.certificateService.approveCertificateAsync(context.userId, certificateId);
+  }
+
+  @ApiOperation({ summary: 'Revoke certificate by id' })
+  @Put('revoke/:certificateId')
+  @RBAC(UserRoles.ORGANIZATION)
+  async revokeCertificateById(
+    @Param('certificateId') certificateId: string,
+    @Body() revokeData: RevokeCertificateDto,
+    @UserRequest() context: AuthorizedContext
+  ) {
+    return this.certificateService.revokeCertificateAsync(context.userId, certificateId, revokeData);
   }
 }

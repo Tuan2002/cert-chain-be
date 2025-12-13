@@ -3,7 +3,7 @@ import { Injectable, Logger } from "@nestjs/common";
 import { Queue } from "bullmq";
 import { DEFAULT_JOB_OPTIONS } from "../configs";
 import { OrganizationEventJobs, OrganizationJobPrefix, QueueNames } from "../enums";
-import { OrganizationAddedEventJob } from "../interfaces";
+import { MemberAddedEventJob, OrganizationAddedEventJob } from "../interfaces";
 
 @Injectable()
 export class OrganizationEventQueueService {
@@ -27,5 +27,20 @@ export class OrganizationEventQueueService {
       jobId,
     });
     this.logger.log(`Organization added job for: ${eventData.organizationId}`);
+  }
+
+  async addMemberAddedEvent(eventData: MemberAddedEventJob): Promise<void> {
+    const jobId = `${OrganizationJobPrefix.MEMBER_ADDED}-${eventData.transactionHash}`;
+    const existingJob = await this.organizationEventQueue.getJob(jobId);
+    if (existingJob) {
+      this.logger.warn(`Member added job ${jobId} already exists. Skipped`);
+      return;
+    }
+
+    await this.organizationEventQueue.add(OrganizationEventJobs.MEMBER_ADDED, eventData, {
+      ...DEFAULT_JOB_OPTIONS,
+      jobId,
+    });
+    this.logger.log(`Member added job for: ${eventData.organizationId}, member: ${eventData.memberAddress}`);
   }
 }

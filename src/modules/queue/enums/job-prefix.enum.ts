@@ -1,5 +1,6 @@
 export enum OrganizationJobPrefix {
   ORGANIZATION_ADDED = "ORG_ADDED",
+  MEMBER_ADDED = "MEMBER_ADDED",
 }
 
 export enum CertificateTypeJobPrefix {

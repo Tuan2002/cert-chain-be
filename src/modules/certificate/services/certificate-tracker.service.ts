@@ -60,7 +60,8 @@ export class CertificateTrackerService {
       id: existingCert.id
     }, {
       status: CertificateStatus.VERIFIED,
-      approvedTxHash: transactionHash
+      approvedTxHash: transactionHash,
+      approvedAt: dayjs().toDate(),
     });
   }
 

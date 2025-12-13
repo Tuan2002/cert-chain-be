@@ -5,3 +5,9 @@ export interface OrganizationAddedEventJob {
   countryCode: string;
   transactionHash: string;
 }
+
+export interface MemberAddedEventJob {
+  organizationId: string;
+  memberAddress: string;
+  transactionHash: string;
+}

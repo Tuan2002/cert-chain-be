@@ -52,6 +52,20 @@ export class OrganizationContractService extends BaseContractService {
     });
   }
 
+  @OnContractEvent(OrganizationContractEvent.ManagerAdded)
+  async handleManagerAdded(
+    orgId: string,
+    managerAddress: string,
+    _event: ContractEventPayload,
+  ) {
+    this.logger.log(`Manager added - Org ID: ${orgId}, Manager: ${managerAddress}`);
+    await this.organizationEventQueueService.addMemberAddedEvent({
+      organizationId: orgId,
+      memberAddress: managerAddress,
+      transactionHash: _event.log.transactionHash,
+    });
+  }
+
   /**
    * Create organization on blockchain
    * @param organizationData 

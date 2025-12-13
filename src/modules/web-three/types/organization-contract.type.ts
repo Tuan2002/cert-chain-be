@@ -9,3 +9,8 @@ export type AddManagerType = {
   orgId: string;
   walletAddress: string;
 };
+
+export type RemoveManagerType = {
+  orgId: string;
+  walletAddress: string;
+};

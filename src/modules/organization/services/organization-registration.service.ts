@@ -304,7 +304,7 @@ export class OrganizationRegistrationService {
         organizationId: organization.id,
         userId: createdUser.id,
         walletAddress: addMemberDto.walletAddress.toLowerCase(),
-        isOwner: true,
+        isOwner: false,
       });
 
       await manager.save(OrganizationMember, newOrganizationMember);

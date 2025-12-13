@@ -1,15 +1,17 @@
 import { QueryOptionsHelper } from "@/base/decorators";
 import { QueryOptionsDto } from "@/base/dtos";
 import { parseFilterQuery, parseSortQuery } from "@/base/utils";
-import { Organization } from "@/modules/organization/entities";
+import { Organization, OrganizationMember } from "@/modules/organization/entities";
 import { IPFSService } from "@/modules/third-party/services";
+import { CertificateContractService } from "@/modules/web-three/services";
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
 import { plainToInstance } from "class-transformer";
 import { DataSource, EntityManager, ILike, Repository } from "typeorm";
 import { CertificateErrorCode } from "../constants";
-import { BaseCertificateDto, CertificateDto, CreateCertificateDto, MultiCertificateCreateDto } from "../dto";
+import { BaseCertificateDto, CertificateDto, CreateCertificateDto, MultiCertificateCreateDto, RevokeCertificateDto } from "../dto";
 import { Certificate, CertificateProfile, CertificateType } from "../entities";
+import { CertificateStatus } from "../enums";
 import { CertificateHashType } from "../types";
 import { generateCertBuffer, generateCertCode } from "../utils";
 
@@ -18,9 +20,12 @@ export class CertificateService {
   constructor(
     @InjectRepository(Certificate)
     private readonly certificateRepository: Repository<Certificate>,
+    @InjectRepository(OrganizationMember)
+    private readonly organizationMemberRepository: Repository<OrganizationMember>,
     @InjectDataSource()
     private readonly dataSource: DataSource,
-    private readonly ipfsService: IPFSService
+    private readonly ipfsService: IPFSService,
+    private readonly certificateContractService: CertificateContractService,
   ) { }
 
   async createCertificateAsync(issuerId: string, certificateData: CreateCertificateDto): Promise<BaseCertificateDto> {
@@ -237,5 +242,64 @@ export class CertificateService {
     }, {
       excludeExtraneousValues: true
     });
+  }
+
+  async approveCertificateAsync(userId: string, certificateId: string) {
+    const certificate = await this.certificateRepository.findOneOrFail({ where: { id: certificateId } });
+    const isOrganizationOwner = await this.organizationMemberRepository.findOne({
+      where: {
+        organizationId: certificate.organizationId,
+        userId: userId,
+        isOwner: true,
+      }
+    });
+
+    if (!isOrganizationOwner) {
+      throw new BadRequestException({
+        message: 'User is not the owner of the organization',
+        code: CertificateErrorCode.UNAUTHORIZED_ACTION
+      });
+    }
+
+    if (certificate.status === CertificateStatus.VERIFIED) {
+      throw new BadRequestException({
+        message: 'Certificate is already verified',
+        code: CertificateErrorCode.INVALID_CERTIFICATE_STATUS
+      });
+    }
+    await this.certificateContractService.approveCertificateAsync(certificateId);
+    return {
+      id: certificateId
+    }
+  }
+
+  async revokeCertificateAsync(userId: string, certificateId: string, revokeData: RevokeCertificateDto) {
+    const certificate = await this.certificateRepository.findOneOrFail({ where: { id: certificateId } });
+    const isOrganizationOwner = await this.organizationMemberRepository.findOne({
+      where: {
+        organizationId: certificate.organizationId,
+        userId: userId,
+        isOwner: true,
+      }
+    });
+
+    if (!isOrganizationOwner) {
+      throw new BadRequestException({
+        message: 'User is not the owner of the organization',
+        code: CertificateErrorCode.UNAUTHORIZED_ACTION
+      });
+    }
+
+    if (certificate.status === CertificateStatus.REVOKED) {
+      throw new BadRequestException({
+        message: 'Certificate is already revoked',
+        code: CertificateErrorCode.INVALID_CERTIFICATE_STATUS
+      });
+    }
+
+    await this.certificateContractService.revokeCertificateAsync(certificateId, revokeData.revokeReason);
+    return {
+      id: certificateId
+    }
   }
 }

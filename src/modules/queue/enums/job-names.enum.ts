@@ -7,6 +7,7 @@ export enum OrganizationMailJobs {
 
 export enum OrganizationEventJobs {
   ORGANIZATION_ADDED = 'organization-added',
+  MEMBER_ADDED = 'member-added',
 }
 
 export enum CertificateTypeEventJobs {

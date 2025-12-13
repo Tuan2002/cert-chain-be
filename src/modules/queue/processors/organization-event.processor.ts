@@ -3,7 +3,7 @@ import { Processor, WorkerHost } from "@nestjs/bullmq";
 import { Logger } from "@nestjs/common";
 import { Job } from "bullmq";
 import { OrganizationEventJobs, QueueNames } from "../enums";
-import { OrganizationAddedEventJob } from "../interfaces";
+import { MemberAddedEventJob, OrganizationAddedEventJob } from "../interfaces";
 
 @Processor(QueueNames.ORGANIZATION_EVENTS)
 export class OrganizationEventProcessor extends WorkerHost {
@@ -19,6 +19,9 @@ export class OrganizationEventProcessor extends WorkerHost {
     switch (job.name) {
       case OrganizationEventJobs.ORGANIZATION_ADDED:
         return this.handleOrganizationAddedEventQueue(job.data);
+
+      case OrganizationEventJobs.MEMBER_ADDED:
+        return this.handleMemberAddedEventQueue(job.data);
     }
   }
 
@@ -36,5 +39,18 @@ export class OrganizationEventProcessor extends WorkerHost {
     });
 
     this.logger.log(`Processed organization added event for organization ID: ${data.organizationId}`);
+  }
+
+  private async handleMemberAddedEventQueue(
+    data: MemberAddedEventJob
+  ): Promise<void> {
+    this.logger.log(`Processing member added event for organization ID: ${data.organizationId}, member address: ${data.memberAddress}`);
+
+    await this.organizationTrackerService.handleMemberAddedEvent({
+      organizationId: data.organizationId,
+      memberAddress: data.memberAddress,
+      transactionHash: data.transactionHash,
+    });
+    this.logger.log(`Processed member added event for organization ID: ${data.organizationId}, member address: ${data.memberAddress}`);
   }
 }

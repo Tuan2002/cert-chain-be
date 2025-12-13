@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
 import { DataSource, EntityManager, Repository } from "typeorm";
 import { Organization, OrganizationMember } from "../entities";
-import { OrganizationAddedEvent } from "../types";
+import { MemberAddedEvent, OrganizationAddedEvent } from "../types";
 
 @Injectable()
 export class OrganizationTrackerService {
@@ -46,6 +46,35 @@ export class OrganizationTrackerService {
         isActive: true,
         addedTxHash: transactionHash,
       })
+    })
+  }
+
+  async handleMemberAddedEvent(eventData: MemberAddedEvent): Promise<void> {
+    const {
+      organizationId,
+      memberAddress,
+      transactionHash
+    } = eventData;
+
+    await this.dataSource.transaction(async (manager: EntityManager) => {
+      const organizationMember = await manager.findOne(OrganizationMember, {
+        where: {
+          organizationId: organizationId,
+          walletAddress: memberAddress.toLowerCase(),
+        }
+      });
+
+      if (!organizationMember) {
+        throw new Error(`Member with address ${memberAddress} not found in organizations`);
+      }
+
+      await manager.update(OrganizationMember, {
+        organizationId: organizationId,
+        walletAddress: memberAddress.toLowerCase(),
+      }, {
+        isActive: true,
+        addedTxHash: transactionHash,
+      });
     })
   }
 }

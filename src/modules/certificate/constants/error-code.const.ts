@@ -8,6 +8,7 @@ export enum CertificateErrorCode {
   CERTIFICATE_NOT_FOUND = 'certificate_not_found',
   CERTIFICATE_ALREADY_EXISTS = 'certificate_already_exists',
   INVALID_ARGUMENTS = 'invalid_arguments',
+  UNAUTHORIZED_ACTION = 'unauthorized_action',
   INVALID_CERTIFICATE_STATUS = 'invalid_certificate_status',
   INVALID_CERTIFICATE_TYPE = 'invalid_certificate_type',
   INVALID_ORGANIZATION = 'invalid_organization'

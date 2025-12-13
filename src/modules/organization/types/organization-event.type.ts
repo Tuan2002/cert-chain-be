@@ -5,3 +5,9 @@ export type OrganizationAddedEvent = {
   countryCode: string;
   transactionHash: string;
 }
+
+export type MemberAddedEvent = {
+  organizationId: string;
+  memberAddress: string;
+  transactionHash: string;
+}
