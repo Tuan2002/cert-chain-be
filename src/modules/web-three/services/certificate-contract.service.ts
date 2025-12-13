@@ -56,11 +56,13 @@ export class CertificateContractService extends BaseContractService {
   @OnContractEvent(CertificateContractEvent.CertificateApproved)
   async handleCertificateApproved(
     certificateId: string,
+    approvedBy: string,
     _event: ContractEventPayload
   ) {
     this.logger.log(`Certificate approved - ID: ${certificateId}`);
     return this.certificateEventQueueService.addCertificateApprovedEvent({
       certificateId,
+      approverAddress: approvedBy,
       transactionHash: _event.log.transactionHash,
     });
   }

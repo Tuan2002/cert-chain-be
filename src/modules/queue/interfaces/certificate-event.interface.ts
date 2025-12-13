@@ -9,6 +9,7 @@ export interface CertificateSignedEventJob {
 
 export interface CertificateApprovedEventJob {
   certificateId: string;
+  approverAddress: string;
   transactionHash: string;
 }
 
