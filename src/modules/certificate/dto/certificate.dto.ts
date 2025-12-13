@@ -1,3 +1,4 @@
+import { BaseUserDto } from "@/modules/user/dto";
 import { PickType } from "@nestjs/swagger";
 import { Expose, Type } from "class-transformer";
 import { Certificate } from "../entities";
@@ -31,4 +32,8 @@ export class CertificateDto extends BaseCertificateDto {
   @Type(() => CertificateProfileDto)
   @Expose()
   authorProfile: CertificateProfileDto;
+
+  @Type(() => BaseUserDto)
+  @Expose()
+  issuer: BaseUserDto;
 }

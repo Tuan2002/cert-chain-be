@@ -164,7 +164,11 @@ export class CertificateService {
           ...parseFilterQuery<Certificate>(filters)
         },
         order: sort ? parseSortQuery<Certificate>(sort) : { createdAt: 'DESC' },
-        relations: ['certificateType', 'certificateProfile']
+        relations: {
+          certificateType: true,
+          certificateProfile: true,
+          issuer: true
+        }
       });
 
     const resPagination = getPagination({
@@ -175,7 +179,8 @@ export class CertificateService {
     const certificates = rawCertificates.map((certificate) =>
       plainToInstance(CertificateDto, {
         ...certificate,
-        authorProfile: certificate.certificateProfile
+        authorProfile: certificate.certificateProfile,
+        issuer: certificate.issuer
       }, {
         excludeExtraneousValues: true,
       }),
@@ -190,7 +195,11 @@ export class CertificateService {
   async getCertificateByIdAsync(id: string): Promise<CertificateDto> {
     const certificate = await this.certificateRepository.findOne({
       where: { id },
-      relations: ['certificateType', 'certificateProfile']
+      relations: {
+        certificateType: true,
+        certificateProfile: true,
+        issuer: true
+      }
     });
 
     if (!certificate) {
