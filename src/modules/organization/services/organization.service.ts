@@ -80,7 +80,8 @@ export class OrganizationService {
     const queryBuilder = this.organizationRepository
       .createQueryBuilder('organization')
       .innerJoin('organization.members', 'member', 'member.userId = :userId', { userId })
-      .leftJoin('member.user', 'user')
+      // .leftJoinAndSelect('member.user', 'user')
+      .select(['organization', 'member.userId', 'member.isOwner', 'user']);
 
     if (search) {
       queryBuilder.andWhere(
