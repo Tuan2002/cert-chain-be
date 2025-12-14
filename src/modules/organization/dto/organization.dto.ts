@@ -1,5 +1,6 @@
+import { BaseUserDto } from "@/modules/user/dto";
 import { ApiProperty, PickType } from "@nestjs/swagger";
-import { Expose } from "class-transformer";
+import { Expose, Type } from "class-transformer";
 import { IsBoolean } from "class-validator";
 import { Organization } from "../entities";
 
@@ -23,4 +24,12 @@ export class OrganizationDto extends PickType(Organization, [
   @Expose()
   @IsBoolean()
   isOwner?: boolean;
+
+  @ApiProperty({
+    description: 'Owner information of the organization',
+    type: () => BaseUserDto,
+  })
+  @Type(() => BaseUserDto)
+  @Expose()
+  owner?: BaseUserDto;
 }

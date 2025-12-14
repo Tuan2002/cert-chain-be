@@ -19,7 +19,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       autoLoadEntities: true,
       namingStrategy: new SnakeNamingStrategy(),
       migrations: ['dist/migrations/*{.ts,.js}'],
-      logging: this.configService.get('NODE_ENV') !== 'production',
+      logging: this.configService.get('NODE_ENV') === 'development'
     };
   }
 }

@@ -31,6 +31,18 @@ export class OrganizationController {
   }
 
   @ApiOperation({
+    summary: 'Get organization by id',
+  })
+  @ApiResponseType(OrganizationDto)
+  @Get('get-organizations/:id')
+  @RBAC(UserRoles.ORGANIZATION, UserRoles.MANAGER, UserRoles.ADMIN)
+  async getOrganizationById(
+    @Param('id') id: string
+  ) {
+    return this.organizationService.getOrganizationByIdAsync(id);
+  }
+
+  @ApiOperation({
     summary: 'Get my organizations with pagination',
   })
   @ApiResponseType(OrganizationDto,

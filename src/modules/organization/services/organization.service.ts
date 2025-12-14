@@ -32,13 +32,23 @@ export class OrganizationService {
               { countryCode: ILike(search) }
             ]
             : {}),
-          ...parseFilterQuery<Organization>(filters)
+          ...parseFilterQuery<Organization>(filters),
+          ...{
+            members: {
+              isOwner: true
+            }
+          }
         },
         order: sort
           ? parseSortQuery<Organization>(sort)
           : { createdAt: 'DESC' },
         skip,
         take,
+        relations: {
+          members: {
+            user: true
+          }
+        }
       });
 
     const resPagination = getPagination({
@@ -47,7 +57,10 @@ export class OrganizationService {
     });
 
     const organizations = rawOrganizations.map((organization) =>
-      plainToInstance(OrganizationDto, organization, {
+      plainToInstance(OrganizationDto, {
+        ...organization,
+        owner: organization?.members?.find((member) => member?.isOwner)?.user,
+      }, {
         excludeExtraneousValues: true,
       }),
     );
@@ -67,7 +80,8 @@ export class OrganizationService {
     const queryBuilder = this.organizationRepository
       .createQueryBuilder('organization')
       .innerJoin('organization.members', 'member', 'member.userId = :userId', { userId })
-      .select(['organization', 'member.userId']);
+      .leftJoin('member.user', 'user')
+      .select(['organization', 'member.userId', 'member.isOwner', 'user']);
 
     if (search) {
       queryBuilder.andWhere(
@@ -97,7 +111,8 @@ export class OrganizationService {
     const organizations = rawOrganizations.map((organization) =>
       plainToInstance(OrganizationDto, {
         ...organization,
-        isOwner: organization?.members.some((member) => member.userId === userId),
+        isOwner: organization?.members?.some((member) => member.userId === userId),
+        owner: organization?.members?.find((member) => member.isOwner)?.user,
       }, {
         excludeExtraneousValues: true,
       }),
@@ -107,5 +122,32 @@ export class OrganizationService {
       data: organizations,
       pagination: resPagination,
     };
+  }
+
+  async getOrganizationByIdAsync(organizationId: string) {
+    const organization = await this.organizationRepository.findOne({
+      where: {
+        id: organizationId,
+        members: {
+          isOwner: true
+        }
+      },
+      relations: {
+        members: {
+          user: true
+        }
+      }
+    });
+
+    if (!organization) {
+      return null;
+    }
+
+    return plainToInstance(OrganizationDto, {
+      ...organization,
+      owner: organization?.members?.find((member) => member?.isOwner)?.user,
+    }, {
+      excludeExtraneousValues: true,
+    });
   }
 }
