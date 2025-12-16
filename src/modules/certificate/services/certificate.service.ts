@@ -10,6 +10,7 @@ import { plainToInstance } from "class-transformer";
 import { DataSource, EntityManager, ILike, Repository } from "typeorm";
 import { CertificateErrorCode } from "../constants";
 import { BaseCertificateDto, CertificateDto, CreateCertificateDto, MultiCertificateCreateDto, RevokeCertificateDto } from "../dto";
+import { UpdateCertificateDto } from "../dto/update-certificate.dto";
 import { Certificate, CertificateProfile, CertificateType } from "../entities";
 import { CertificateStatus } from "../enums";
 import { CertificateHashType } from "../types";
@@ -301,5 +302,53 @@ export class CertificateService {
     return {
       id: certificateId
     }
+  }
+
+  async updateCertificateAsync(certificateId: string, updateData: UpdateCertificateDto) {
+    const certificateType = await this.dataSource.getRepository(CertificateType).findOneBy({ id: updateData.certificateTypeId });
+    if (!certificateType) {
+      throw new BadRequestException({
+        message: 'Invalid certificate type',
+        code: CertificateErrorCode.INVALID_ARGUMENTS
+      })
+    }
+
+    const certificate = await this.certificateRepository.findOneOrFail({ where: { id: certificateId } });
+    if (certificate.status !== CertificateStatus.CREATED) {
+      throw new BadRequestException({
+        message: 'Only certificates not yet verified can be updated',
+        code: CertificateErrorCode.INVALID_CERTIFICATE_STATUS
+      });
+    }
+
+    await this.dataSource.transaction(async (manager: EntityManager) => {
+      const { authorProfile, ...certificateData } = updateData;
+      await manager.update(CertificateProfile, { id: certificate.certificateProfileId }, {
+        ...authorProfile
+      });
+
+      await manager.update(Certificate, { id: certificateId }, {
+        ...certificateData
+      })
+    });
+
+    return {
+      id: certificateId
+    }
+  }
+
+  async deleteCertificateAsync(certificateId: string) {
+    const certificate = await this.certificateRepository.findOneOrFail({ where: { id: certificateId } });
+    if (certificate.status !== CertificateStatus.CREATED) {
+      throw new BadRequestException({
+        message: 'Only certificates not yet verified can be deleted',
+        code: CertificateErrorCode.INVALID_CERTIFICATE_STATUS
+      });
+    }
+
+    await this.certificateRepository.delete({ id: certificateId });
+    return {
+      id: certificateId
+    };
   }
 }
