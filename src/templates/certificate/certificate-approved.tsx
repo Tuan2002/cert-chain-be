@@ -13,7 +13,6 @@ import {
   Text,
 } from '@react-email/components';
 import dayjs from 'dayjs';
-import QRCode from 'qrcode';
 import { Footer, Header } from '../components';
 import {
   buttonContainer,
@@ -127,17 +126,6 @@ const txHashText = {
   margin: '5px 0 0 0',
 };
 
-const statusBadge = {
-  display: 'inline-block',
-  backgroundColor: '#dcfce7',
-  color: '#166534',
-  padding: '8px 16px',
-  borderRadius: '20px',
-  fontSize: '14px',
-  fontWeight: '600',
-  margin: '10px 0',
-};
-
 const highlightBox = {
   backgroundColor: '#fef3c7',
   borderLeft: '4px solid #f59e0b',
@@ -154,6 +142,7 @@ interface CertificateApprovedEmailProps {
   validFrom: Date;
   validTo: Date;
   certificateCode: string;
+  qrCodeUrl: string;
   approvalTxHash: string;
 }
 
@@ -165,12 +154,12 @@ export const CertificateApprovedEmail = ({
   validFrom,
   validTo,
   certificateCode,
+  qrCodeUrl,
   approvalTxHash,
 }: CertificateApprovedEmailProps) => {
   const previewText = `Your certificate has been approved and issued!`;
   const certificateViewUrl = `${process.env.APP_URL || 'http://localhost:3000'}/certificates/${certificateCode}`;
   const blockExplorerUrl = `${process.env.ETHEREUM_EXPLORER_URL || 'https://etherscan.io'}/tx/${approvalTxHash}`;
-  const qrCodeUrl = QRCode.toDataURL(certificateViewUrl);
 
   return (
     <Html>
@@ -186,10 +175,6 @@ export const CertificateApprovedEmail = ({
             <Text style={paragraph}>
               Congratulations! Your certificate has been successfully approved and issued on the blockchain.
             </Text>
-            <Text style={paragraph}>
-              <span style={statusBadge}>✓ Approved & Issued</span>
-            </Text>
-
             <Section style={successBox}>
               <Text style={successTitle}>
                 Certificate Successfully Issued!
@@ -269,7 +254,7 @@ export const CertificateApprovedEmail = ({
 
             <Section style={highlightBox}>
               <Text style={paragraph}>
-                <strong>📱 What you can do next:</strong>
+                <strong>What you can do next:</strong>
               </Text>
               <Text style={paragraph}>
                 • Download your certificate in PDF format

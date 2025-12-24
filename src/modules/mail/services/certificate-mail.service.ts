@@ -1,5 +1,6 @@
 import { CertificateApprovedEmail } from "@/templates/certificate";
 import { Injectable, Logger } from "@nestjs/common";
+import QRCode from "qrcode";
 import { SendCertificateApprovedMailDto } from "../dto";
 import { MailService } from "./mail.service";
 
@@ -28,6 +29,8 @@ export class CertificateMailService {
       approvalTxHash,
     } = sendCertificateData;
     const subject = 'CertChain - Certificate Approved';
+    const qrCodeUrl = await QRCode.toDataURL(`${process.env.APP_URL}/certificates/${certificateCode}`);
+
     const body = CertificateApprovedEmail({
       organizationName,
       certificateType,
@@ -36,6 +39,7 @@ export class CertificateMailService {
       validFrom,
       validTo,
       certificateCode,
+      qrCodeUrl,
       approvalTxHash,
     });
 
