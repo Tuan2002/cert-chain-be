@@ -12,12 +12,14 @@ import { WebThreeModule } from '../web-three/web-three.module';
 import { QueueNames } from './enums';
 import {
   CertificateEventProcessor,
+  CertificateMailProcessor,
   CertificateTypeEventProcessor,
   OrganizationEventProcessor,
   OrganizationMailProcessor
 } from './processors';
 import {
   CertificateEventQueueService,
+  CertificateMailQueueService,
   CertificateTypeEventQueueService,
   OrganizationEventQueueService,
   OrganizationMailQueueService
@@ -39,6 +41,7 @@ import {
     }),
     BullModule.registerQueue(
       { name: QueueNames.ORGANIZATION_MAILS },
+      { name: QueueNames.CERTIFICATE_MAILS },
       { name: QueueNames.ORGANIZATION_EVENTS },
       { name: QueueNames.CERTIFICATE_TYPE_EVENTS },
       { name: QueueNames.CERTIFICATE_EVENTS }
@@ -46,6 +49,10 @@ import {
     BullBoardModule.forFeature(
       {
         name: QueueNames.ORGANIZATION_MAILS,
+        adapter: BullMQAdapter,
+      },
+      {
+        name: QueueNames.CERTIFICATE_MAILS,
         adapter: BullMQAdapter,
       },
       {
@@ -73,16 +80,19 @@ import {
   controllers: [],
   providers: [
     OrganizationMailQueueService,
+    CertificateMailQueueService,
     OrganizationEventQueueService,
     CertificateTypeEventQueueService,
     CertificateEventQueueService,
     OrganizationMailProcessor,
+    CertificateMailProcessor,
     OrganizationEventProcessor,
     CertificateTypeEventProcessor,
     CertificateEventProcessor
   ],
   exports: [
     OrganizationMailQueueService,
+    CertificateMailQueueService,
     OrganizationEventQueueService,
     CertificateTypeEventQueueService,
     CertificateEventQueueService

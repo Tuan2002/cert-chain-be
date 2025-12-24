@@ -2,6 +2,7 @@ import { WebThreeModule } from "@modules/web-three/web-three.module";
 import { forwardRef, Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Organization, OrganizationMember } from "../organization/entities";
+import { QueueModule } from "../queue/queue.module";
 import { ThirdPartyModule } from "../third-party/third-party.module";
 import { User } from "../user/entities";
 import { CertificateController } from "./controllers";
@@ -27,6 +28,7 @@ import {
       OrganizationMember,
       User
     ]),
+    forwardRef(() => QueueModule),
     forwardRef(() => WebThreeModule),
     ThirdPartyModule
   ],

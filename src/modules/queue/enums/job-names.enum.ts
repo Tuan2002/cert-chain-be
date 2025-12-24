@@ -5,6 +5,10 @@ export enum OrganizationMailJobs {
   SEND_MANAGER_ADDED_EMAIL = 'send-manager-added-email',
 }
 
+export enum CertificateMailJobs {
+  SEND_CERTIFICATE_APPROVED_EMAIL = 'send-certificate-approved-email',
+}
+
 export enum OrganizationEventJobs {
   ORGANIZATION_ADDED = 'organization-added',
   MEMBER_ADDED = 'member-added',

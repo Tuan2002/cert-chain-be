@@ -1,3 +1,4 @@
+import { CertificateMailQueueService } from "@/modules/queue/services";
 import { Injectable } from "@nestjs/common";
 import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
 import dayjs from "dayjs";
@@ -13,6 +14,7 @@ export class CertificateTrackerService {
     private readonly certificateRepository: Repository<Certificate>,
     @InjectDataSource()
     private readonly dataSource: DataSource,
+    private readonly certificateMailQueueService: CertificateMailQueueService,
   ) { }
 
   async handleCertificateSignedEvent(eventData: CertificateSignedEvent): Promise<void> {
@@ -30,6 +32,18 @@ export class CertificateTrackerService {
     if (existingCert.status === CertificateStatus.SIGNED) {
       return;
     }
+
+    await this.certificateMailQueueService.addSendCertificateApprovedEmailJob({
+      to: existingCert.certificateProfile.authorEmail,
+      recipientName: existingCert.certificateProfile.authorName,
+      certificateType: existingCert.certificateType.name,
+      organizationName: existingCert.organization.name,
+      approvedAt: dayjs().toDate(),
+      validFrom: existingCert.validFrom,
+      validTo: existingCert.validTo,
+      certificateCode: existingCert.code,
+      approvalTxHash: transactionHash,
+    });
 
     await this.certificateRepository.update({
       id: existingCert.id
@@ -49,6 +63,12 @@ export class CertificateTrackerService {
     const existingCert = await this.certificateRepository.findOneOrFail({
       where: {
         code: certificateId,
+      },
+
+      relations: {
+        organization: true,
+        certificateProfile: true,
+        certificateType: true,
       }
     });
 
