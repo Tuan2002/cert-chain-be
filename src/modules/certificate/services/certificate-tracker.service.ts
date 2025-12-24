@@ -1,7 +1,10 @@
+import { FileType, StorageFolders } from "@/base/enums";
 import { CertificateMailQueueService } from "@/modules/queue/services";
+import { S3FileService } from "@/modules/third-party/services";
 import { Injectable } from "@nestjs/common";
 import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
 import dayjs from "dayjs";
+import QRCode from "qrcode";
 import { DataSource, Repository } from "typeorm";
 import { Certificate } from "../entities";
 import { CertificateStatus } from "../enums";
@@ -15,6 +18,7 @@ export class CertificateTrackerService {
     @InjectDataSource()
     private readonly dataSource: DataSource,
     private readonly certificateMailQueueService: CertificateMailQueueService,
+    private readonly s3FileService: S3FileService,
   ) { }
 
   async handleCertificateSignedEvent(eventData: CertificateSignedEvent): Promise<void> {
@@ -64,6 +68,14 @@ export class CertificateTrackerService {
       return;
     }
 
+    const qrCodeBuffer = await QRCode.toBuffer(`${process.env.APP_URL}/certificates/${existingCert.code}`);
+    const qrCodeKey = `${StorageFolders.CERTIFICATES}/${existingCert.code}-qr.png`;
+    const qrCodeUrl = await this.s3FileService.uploadBuffer(
+      qrCodeBuffer,
+      qrCodeKey,
+      FileType.IMAGE_PNG
+    );
+
     await this.certificateMailQueueService.addSendCertificateApprovedEmailJob({
       to: existingCert.certificateProfile.authorEmail,
       recipientName: existingCert.certificateProfile.authorName,
@@ -73,6 +85,7 @@ export class CertificateTrackerService {
       validFrom: existingCert.validFrom,
       validTo: existingCert.validTo,
       certificateCode: existingCert.code,
+      qrCodeUrl,
       approvalTxHash: transactionHash,
     });
 

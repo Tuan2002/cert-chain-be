@@ -3,4 +3,5 @@ export enum StorageFolders {
   USER_AVATARS = 'user-avatars',
   TOKEN_IMAGES = 'token-images',
   NFT_IMAGES = 'nft-images',
+  CERTIFICATES = 'certificates'
 }

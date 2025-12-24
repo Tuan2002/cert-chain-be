@@ -7,5 +7,6 @@ export interface SendCertificateApprovedJob {
   validFrom: Date;
   validTo: Date;
   certificateCode: string;
+  qrCodeUrl: string;
   approvalTxHash: string;
 }

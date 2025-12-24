@@ -52,4 +52,32 @@ export class S3FileService {
       accessUrl,
     }
   }
+
+  async uploadBuffer(
+    buffer: Buffer,
+    fileKey: string,
+    contentType: string,
+    permission: StoragePermission = StoragePermission.PUBLIC,
+  ): Promise<string> {
+    const bucketEndpoint = this.configService.getOrThrow<string>('S3_API_ENDPOINT');
+    const cdnEndpoint = this.configService.getOrThrow<string>('S3_CDN_ENDPOINT');
+    const bucketName = this.configService.getOrThrow<string>('S3_BUCKET_NAME');
+
+    const command = new PutObjectCommand({
+      Bucket: bucketName,
+      Key: fileKey,
+      Body: buffer,
+      ACL: permission,
+      ContentType: contentType,
+      ContentLength: buffer.length,
+    });
+
+    await this.s3Client.send(command);
+
+    const accessUrl = cdnEndpoint
+      ? `${cdnEndpoint}/${fileKey}`
+      : `${bucketEndpoint}/${bucketName}/${fileKey}`;
+
+    return accessUrl;
+  }
 }

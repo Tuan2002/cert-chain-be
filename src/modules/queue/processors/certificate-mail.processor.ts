@@ -39,6 +39,7 @@ export class CertificateMailProcessor extends WorkerHost {
       validFrom: data.validFrom,
       validTo: data.validTo,
       certificateCode: data.certificateCode,
+      qrCodeUrl: data.qrCodeUrl,
       approvalTxHash: data.approvalTxHash,
     });
     this.logger.log(`Processed email for approved certificate: ${data.to}`);

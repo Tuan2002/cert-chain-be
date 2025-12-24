@@ -32,5 +32,9 @@ export class SendCertificateApprovedMailDto {
 
   @IsString()
   @IsNotEmpty()
+  qrCodeUrl: string;
+
+  @IsString()
+  @IsNotEmpty()
   approvalTxHash: string;
 }
