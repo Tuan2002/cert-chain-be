@@ -33,18 +33,6 @@ export class CertificateTrackerService {
       return;
     }
 
-    await this.certificateMailQueueService.addSendCertificateApprovedEmailJob({
-      to: existingCert.certificateProfile.authorEmail,
-      recipientName: existingCert.certificateProfile.authorName,
-      certificateType: existingCert.certificateType.name,
-      organizationName: existingCert.organization.name,
-      approvedAt: dayjs().toDate(),
-      validFrom: existingCert.validFrom,
-      validTo: existingCert.validTo,
-      certificateCode: existingCert.code,
-      approvalTxHash: transactionHash,
-    });
-
     await this.certificateRepository.update({
       id: existingCert.id
     }, {
@@ -75,6 +63,18 @@ export class CertificateTrackerService {
     if (existingCert.status === CertificateStatus.VERIFIED) {
       return;
     }
+
+    await this.certificateMailQueueService.addSendCertificateApprovedEmailJob({
+      to: existingCert.certificateProfile.authorEmail,
+      recipientName: existingCert.certificateProfile.authorName,
+      certificateType: existingCert.certificateType.name,
+      organizationName: existingCert.organization.name,
+      approvedAt: dayjs().toDate(),
+      validFrom: existingCert.validFrom,
+      validTo: existingCert.validTo,
+      certificateCode: existingCert.code,
+      approvalTxHash: transactionHash,
+    });
 
     await this.certificateRepository.update({
       id: existingCert.id
